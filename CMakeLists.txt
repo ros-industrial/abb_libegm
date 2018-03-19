@@ -10,6 +10,11 @@ find_package(Boost REQUIRED COMPONENTS system thread)
 #############################
 find_package(Protobuf REQUIRED)
 
+# work around Protobuf exporting 'lpthread' as a library: we
+# export the dependency on pthread using the CFG_EXTRAS files
+list (REMOVE_ITEM PROTOBUF_LIBRARIES "-lpthread")
+
+
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
 find_program(Protobuf_PROTOC_LOC NAMES protoc)
 if (NOT Protobuf_PROTOC_LOC)
@@ -26,9 +31,18 @@ protobuf_generate_cpp(EgmProtoSources EgmProtoHeaders ${EgmProtoFiles})
 ###################################
 ## catkin specific configuration ##
 ###################################
-catkin_package(INCLUDE_DIRS include
-               LIBRARIES ${PROJECT_NAME}
-               DEPENDS Boost Protobuf)
+catkin_package(
+  INCLUDE_DIRS
+    include
+  LIBRARIES
+    ${PROJECT_NAME}
+  CFG_EXTRAS
+    # this exports pthread dependency for us
+    abb_libegm-extras.cmake
+  DEPENDS
+    Boost
+    PROTOBUF
+)
 
 ###########
 ## Build ##
