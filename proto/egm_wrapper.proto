@@ -1,0 +1,194 @@
+//======================================================================================================================
+//
+// Wrapper messages.
+//
+// Note: Used to wrap the actual EGM messages, which are defined in the egm.proto file from ABB Robotics.
+//       This can be used in intermediate components that are utilizing EGM communication for motion control.
+//
+//======================================================================================================================
+
+syntax = "proto2";
+
+package abb.egm.wrapper;
+
+//======================================================================================================================
+//
+// Auxiliary messages.
+//
+//======================================================================================================================
+
+message Header
+{ 
+  enum MessageType
+  {
+    UNDEFINED = 0;
+    DATA      = 1; // Message contains data sent by the robot controller.
+  }
+
+  optional uint32      sequance_number = 1; // Sequence number (to be able to detect lost messages).
+  optional uint32      time_stamp      = 2; // Time stamp in milliseconds.
+  optional MessageType message_type    = 3 [default = UNDEFINED];
+}
+
+// Note: Status of the robot controller, and the active EGM motion.
+message Status
+{
+  enum EGMState
+  {
+    EGM_UNDEFINED = 0;
+    EGM_ERROR     = 1;
+    EGM_STOPPED   = 2;
+    EGM_RUNNING   = 3;
+  }
+
+  enum MotorState 
+  {
+    MOTORS_UNDEFINED = 0;
+    MOTORS_ON        = 1;
+    MOTORS_OFF       = 2;
+  }
+
+  enum RAPIDExecutionState
+  {
+    RAPID_UNDEFINED = 0;
+    RAPID_STOPPED   = 1;
+    RAPID_RUNNING   = 2;
+  }
+  
+  optional bool                egm_convergence_met   = 1;
+  optional EGMState            egm_state             = 2 [default = EGM_UNDEFINED];
+  optional MotorState          motor_state           = 3 [default = MOTORS_UNDEFINED];
+  optional RAPIDExecutionState rapid_execution_state = 4 [default = RAPID_UNDEFINED];
+}
+
+//===========================================================
+//
+// Joint space related messages.
+//
+//===========================================================
+
+// Note: This message is used for joints values, and only up to seven values will be considered. 
+//
+//       For six axes robots:
+//       - If robot joints   : 1-6 values.
+//       - If external joints: 1-6 values.
+//       For seven axes robots:
+//       - If robot joints   : 1-7 values.
+//       - If external joints: 1-5 values.
+message Joints
+{
+  repeated double values = 1;
+}
+
+message JointSpace
+{
+  optional Joints position = 1; // Units [degrees]
+  optional Joints velocity = 2; // Units [degrees/s]
+}
+
+//===========================================================
+//
+// Cartesian space related messages.
+//
+// Note: Interpreted relative to the sensor frame defined
+//       when setting up EGM with RAPID instructions.
+//       E.g. with the EGMActPose RAPID instruction.
+//
+//===========================================================
+
+message Cartesian
+{
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+}
+
+// Note: Higher priority than quaternions.
+message Euler
+{
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+}
+
+// Note: Lower priority than Euler angles.
+message Quaternion
+{
+  optional double u0 = 1;
+  optional double u1 = 2;
+  optional double u2 = 3;
+  optional double u3 = 4;
+}
+
+message CartesianPose
+{
+  optional Cartesian  position   = 1; // Units [mm].
+  optional Euler      euler      = 2; // Units [degrees].
+  optional Quaternion quaternion = 3; // Units [-].
+}
+
+message CartesianVelocity 
+{
+  optional Cartesian linear  = 1; // Units [mm/s].
+  optional Euler     angular = 2; // Units [degrees/s].
+}
+
+message CartesianSpace
+{
+  optional CartesianPose     pose     = 1;
+  optional CartesianVelocity velocity = 2;
+}
+
+//===========================================================
+//
+// Combined joint and Cartesian space auxiliary messages.
+//
+//===========================================================
+
+// Note: Joint or Cartesian motion depends on the used EGM RAPID instructions.
+message Robot
+{
+  optional JointSpace     joints    = 1;
+  optional CartesianSpace cartesian = 2;
+}
+
+message External
+{
+  optional JointSpace joints = 1;
+}
+
+// Note: The velocity sub fields are estimated from the actual EGM messages.
+message Feedback
+{  
+  optional Robot    robot    = 1;
+  optional External external = 2;
+}
+
+// Note: The velocity sub fields are estimated from the actual EGM messages.
+message Planned
+{
+  optional Robot    robot    = 1;
+  optional External external = 2;
+}
+
+//======================================================================================================================
+//
+// Primary messages.
+//
+//======================================================================================================================
+
+// Inputs extracted from the robot controller outbound messages (i.e. EgmRobot).
+message Input
+{
+  optional Header   header   = 1;
+  optional Feedback feedback = 2;
+  optional Planned  planned  = 3;
+  optional Status   status   = 4;
+}
+
+// Outputs to send to the robot controller.
+message Output
+{
+  optional Robot    robot    = 1; // Outputs to the robot.
+  optional External external = 2; // Outputs to external axes.
+}
