@@ -12,7 +12,9 @@
 
   <buildtool_depend>catkin</buildtool_depend>
 
+  <build_depend>boost</build_depend>
   <build_depend>protobuf-dev</build_depend>
 
+  <run_depend>boost</run_depend>
   <run_depend>protobuf</run_depend>
 </package>
