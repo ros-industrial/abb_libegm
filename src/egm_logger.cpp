@@ -55,7 +55,7 @@ EGMLogger::EGMLogger(const std::string& filename, const bool use_default_headers
 :
 number_of_logged_messages_(0)
 {
-  log_stream_.open(filename, std::ios::trunc);
+  log_stream_.open(filename.c_str(), std::ios::trunc);
 
   if (use_default_headers)
   {
