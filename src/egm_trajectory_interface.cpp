@@ -170,7 +170,8 @@ void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareRampDownGoal(c
   }
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(const StaticPositionGoal& position_goal)
+void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(const StaticPositionGoal& position_goal,
+                                                                             const bool fast_transition)
 {
   data.mode = (position_goal.robot().has_cartesian() ? EGMPose : EGMJoint);
 
@@ -181,11 +182,12 @@ void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(con
 
   // Prepare the interpolation conditions.
   interpolator_conditions_.mode = data.mode;
-  interpolator_conditions_.duration = STATIC_GOAL_DURATION;
+  interpolator_conditions_.duration = (fast_transition ? STATIC_GOAL_DURATION_SHORT : STATIC_GOAL_DURATION);
   interpolator_conditions_.operation = EGMInterpolator::RampInPosition;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(const StaticVelocityGoal& velocity_goal)
+void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(const StaticVelocityGoal& velocity_goal,
+                                                                             const bool fast_transition)
 {
   data.mode = (velocity_goal.robot().has_cartesian() ? EGMPose : EGMJoint);
 
@@ -196,7 +198,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareStaticGoal(con
 
   // Prepare the interpolation conditions.
   interpolator_conditions_.mode = data.mode;
-  interpolator_conditions_.duration = STATIC_GOAL_DURATION;
+  interpolator_conditions_.duration = (fast_transition ? STATIC_GOAL_DURATION_SHORT : STATIC_GOAL_DURATION);
   interpolator_conditions_.operation = EGMInterpolator::RampInVelocity;
 }
 
@@ -650,7 +652,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
     controller_.update(data_.state, motion_step_, configurations_);
   }
 
-  // Generate the output.
+  // Generate the outputs.
   if (p_outputs && data_.has_active_goal)
   {
     // Evaluate the interpolator.
@@ -658,8 +660,11 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
 
     // Calculate the outputs to the robot controller.
     controller_.calculate(p_outputs, &motion_step_);
+  }
 
-    // Update the execution progress.
+  // Update the execution progress.
+  if(p_outputs)
+  {
     data_.execution_progress.mutable_inputs()->CopyFrom(inputs.current());
     data_.execution_progress.mutable_outputs()->CopyFrom(*p_outputs);
     data_.execution_progress.mutable_goal()->CopyFrom(motion_step_.internal_goal);
@@ -884,7 +889,8 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
       // Update the internal goal, with the new static goal.
       if (data_.pending_events.do_static_position_goal_update)
       {
-        motion_step_.prepareStaticGoal(data_.pending_events.static_position_goal);
+        motion_step_.prepareStaticGoal(data_.pending_events.static_position_goal,
+                                       data_.pending_events.do_static_goal_fast_update);
         data_.pending_events.static_position_goal.Clear();
         data_.pending_events.do_static_position_goal_update = false;
         data_.has_new_goal = true;
@@ -892,7 +898,8 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
       }
       else if (data_.pending_events.do_static_velocity_goal_update)
       {
-        motion_step_.prepareStaticGoal(data_.pending_events.static_velocity_goal);
+        motion_step_.prepareStaticGoal(data_.pending_events.static_velocity_goal,
+                                       data_.pending_events.do_static_goal_fast_update);
         data_.pending_events.static_velocity_goal.Clear();
         data_.pending_events.do_static_velocity_goal_update = false;
         data_.has_new_goal = true;
@@ -1045,27 +1052,29 @@ void EGMTrajectoryInterface::TrajectoryMotion::startStaticGoal(const bool discar
   data_.pending_events.do_static_goal_start = true;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositionGoal& position_goal)
+void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
 {
   // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = true;
-  data_.pending_events.do_stop = true;
+  data_.pending_events.do_ramp_down = !fast_transition;
+  data_.pending_events.do_stop = !fast_transition;
   data_.pending_events.do_resume = true;
+  data_.pending_events.do_static_goal_fast_update = fast_transition;
   data_.pending_events.do_static_position_goal_update = true;
   data_.pending_events.do_static_velocity_goal_update = false;
   data_.pending_events.static_position_goal.CopyFrom(position_goal);
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocityGoal& velocity_goal)
+void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
 {
   // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = true;
-  data_.pending_events.do_stop = true;
+  data_.pending_events.do_ramp_down = !fast_transition;
+  data_.pending_events.do_stop = !fast_transition;
   data_.pending_events.do_resume = true;
+  data_.pending_events.do_static_goal_fast_update = fast_transition;
   data_.pending_events.do_static_velocity_goal_update = true;
   data_.pending_events.do_static_position_goal_update = false;
   data_.pending_events.static_velocity_goal.CopyFrom(velocity_goal);
@@ -1087,13 +1096,13 @@ bool EGMTrajectoryInterface::TrajectoryMotion::retrieveExecutionProgress(traject
   // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  if (data_.has_updated_execution_progress && data_.execution_progress.has_inputs())
+  if (data_.execution_progress.has_inputs())
   {
     p_progress->CopyFrom(data_.execution_progress);
+    result = data_.has_updated_execution_progress;
     data_.has_updated_execution_progress = false;
-    result = true;
   }
-  
+
   return result;
 }
 
@@ -1252,14 +1261,14 @@ void EGMTrajectoryInterface::startStaticGoal(const bool discard_trajectories)
   trajectory_motion_.startStaticGoal(discard_trajectories);
 }
 
-void EGMTrajectoryInterface::setStaticGoal(const StaticPositionGoal& position_goal)
+void EGMTrajectoryInterface::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
 {
-  trajectory_motion_.setStaticGoal(position_goal);
+  trajectory_motion_.setStaticGoal(position_goal, fast_transition);
 }
 
-void EGMTrajectoryInterface::setStaticGoal(const StaticVelocityGoal& velocity_goal)
+void EGMTrajectoryInterface::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
 {
-  trajectory_motion_.setStaticGoal(velocity_goal);
+  trajectory_motion_.setStaticGoal(velocity_goal, fast_transition);
 }
 
 void EGMTrajectoryInterface::finishStaticGoal(const bool resume)

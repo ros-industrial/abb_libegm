@@ -34,6 +34,8 @@
  ***********************************************************************************************************************
  */
 
+#include <sstream>
+
 #include "abb_libegm/egm_common.h"
 #include "abb_libegm/egm_logger.h"
 
@@ -49,14 +51,48 @@ namespace egm
  * Primary methods
  */
 
-EGMLogger::EGMLogger(const std::string& filename, const std::string& description_header)
+EGMLogger::EGMLogger(const std::string& filename, const bool use_default_headers)
 :
 number_of_logged_messages_(0)
 {
   log_stream_.open(filename.c_str(), std::ios::trunc);
-  if (!description_header.empty())
+
+  if (use_default_headers)
   {
-    log_stream_ << description_header;
+    std::stringstream ss;
+    ss << "TIMESTAMP,"
+       // Robot feedback.
+       << "R_FB_POS_RJ1,R_FB_POS_RJ2,R_FB_POS_RJ3,R_FB_POS_RJ4,R_FB_POS_RJ5,R_FB_POS_RJ6,"
+       << "R_FB_POS_EJ1,R_FB_POS_EJ2,R_FB_POS_EJ3,R_FB_POS_EJ4,R_FB_POS_EJ5,R_FB_POS_EJ6,"
+       << "R_FB_VEL_RJ1,R_FB_VEL_RJ2,R_FB_VEL_RJ3,R_FB_VEL_RJ4,R_FB_VEL_RJ5,R_FB_VEL_RJ6,"
+       << "R_FB_VEL_EJ1,R_FB_VEL_EJ2,R_FB_VEL_EJ3,R_FB_VEL_EJ4,R_FB_VEL_EJ5,R_FB_VEL_EJ6,"
+       << "R_FB_POS_X,R_FB_POS_Y,R_FB_POS_Z,"
+       << "R_FB_EULER_X,R_FB_EULER_Y,R_FB_EULER_Z,"
+       << "R_FB_QUAT_U0,R_FB_QUAT_U1,R_FB_QUAT_U2,R_FB_QUAT_U3,"
+       << "R_FB_VEL_LX,R_FB_VEL_LY,R_FB_VEL_LZ,"
+       << "R_FB_VEL_AX,R_FB_VEL_AY,R_FB_VEL_AZ,"
+       // Robot planned.
+       << "R_PL_POS_RJ1,R_PL_POS_RJ2,R_PL_POS_RJ3,R_PL_POS_RJ4,R_PL_POS_RJ5,R_PL_POS_RJ6,"
+       << "R_PL_POS_EJ1,R_PL_POS_EJ2,R_PL_POS_EJ3,R_PL_POS_EJ4,R_PL_POS_EJ5,R_PL_POS_EJ6,"
+       << "R_PL_VEL_RJ1,R_PL_VEL_RJ2,R_PL_VEL_RJ3,R_PL_VEL_RJ4,R_PL_VEL_RJ5,R_PL_VEL_RJ6,"
+       << "R_PL_VEL_EJ1,R_PL_VEL_EJ2,R_PL_VEL_EJ3,R_PL_VEL_EJ4,R_PL_VEL_EJ5,R_PL_VEL_EJ6,"
+       << "R_PL_POS_X,R_PL_POS_Y,R_PL_POS_Z,"
+       << "R_PL_EULER_X,R_PL_EULER_Y,R_PL_EULER_Z,"
+       << "R_PL_QUAT_U0,R_PL_QUAT_U1,R_PL_QUAT_U2,R_PL_QUAT_U3,"
+       << "R_PL_VEL_LX,R_PL_VEL_LY,R_PL_VEL_LZ,"
+       << "R_PL_VEL_AX,R_PL_VEL_AY,R_PL_VEL_AZ,"
+       // Sensor references.
+       << "S_REF_POS_RJ1,S_REF_POS_RJ2,S_REF_POS_RJ3,S_REF_POS_RJ4,S_REF_POS_RJ5,S_REF_POS_RJ6,"
+       << "S_REF_POS_EJ1,S_REF_POS_EJ2,S_REF_POS_EJ3,S_REF_POS_EJ4,S_REF_POS_EJ5,S_REF_POS_EJ6,"
+       << "S_REF_VEL_RJ1,S_REF_VEL_RJ2,S_REF_VEL_RJ3,S_REF_VEL_RJ4,S_REF_VEL_RJ5,S_REF_VEL_RJ6,"
+       << "S_REF_VEL_EJ1,S_REF_VEL_EJ2,S_REF_VEL_EJ3,S_REF_VEL_EJ4,S_REF_VEL_EJ5,S_REF_VEL_EJ6,"
+       << "S_REF_POS_X,S_REF_POS_Y,S_REF_POS_Z,"
+       << "S_REF_EULER_X,S_REF_EULER_Y,S_REF_EULER_Z,"
+       << "S_REF_QUAT_U0,S_REF_QUAT_U1,S_REF_QUAT_U2,S_REF_QUAT_U3,"
+       << "S_REF_VEL_LX,S_REF_VEL_LY,S_REF_VEL_LZ,"
+       << "S_REF_VEL_AX,S_REF_VEL_AY,S_REF_VEL_AZ\n";
+    
+    log_stream_ << ss.str();
     log_stream_.flush();
   }
 }
@@ -111,7 +147,7 @@ void EGMLogger::add(const wrapper::CartesianPose& pose)
               << pose.quaternion().u3() << ",";
 }
 
-void EGMLogger::add(const wrapper::CartesianVelocity& velocity)
+void EGMLogger::add(const wrapper::CartesianVelocity& velocity, const bool last)
 {
   log_stream_ << velocity.linear().x() << ","
               << velocity.linear().y() << ","
@@ -119,7 +155,7 @@ void EGMLogger::add(const wrapper::CartesianVelocity& velocity)
 
   log_stream_ << velocity.angular().x() << ","
               << velocity.angular().y() << ","
-              << velocity.angular().z() << ",";
+              << velocity.angular().z() << (last ? "" : ",");
 }
 
 /************************************************************

@@ -701,9 +701,10 @@ const std::string& EGMBaseInterface::callback(const EGMServerData& server_data)
 
 void EGMBaseInterface::logData(const InputContainer& inputs, const OutputContainer& outputs, const double max_time)
 {
-  if (p_logger_  && p_logger_->calculateTimeLogged(inputs_.estimated_sample_time()) <= max_time)
+  if (p_logger_ && p_logger_->calculateTimeLogged(inputs_.estimated_sample_time()) <= max_time)
   {
     const wrapper::Feedback& feedback = inputs.current().feedback();
+    const wrapper::Planned& planned = inputs.current().planned();
     const wrapper::Output& output = outputs.current;
 
     // Header (i.e. time stamp).
@@ -715,11 +716,17 @@ void EGMBaseInterface::logData(const InputContainer& inputs, const OutputContain
     p_logger_->add(feedback.robot().cartesian().pose());
     p_logger_->add(feedback.robot().cartesian().velocity());
 
+    // Robot planned.
+    p_logger_->add(planned.robot().joints().position(), planned.external().joints().position());
+    p_logger_->add(planned.robot().joints().velocity(), planned.external().joints().velocity());
+    p_logger_->add(planned.robot().cartesian().pose());
+    p_logger_->add(planned.robot().cartesian().velocity());
+
     // Server outputs.
     p_logger_->add(output.robot().joints().position(), output.external().joints().position());
     p_logger_->add(output.robot().joints().velocity(), output.external().joints().velocity());
     p_logger_->add(output.robot().cartesian().pose());
-    p_logger_->add(output.robot().cartesian().velocity());
+    p_logger_->add(output.robot().cartesian().velocity(), true);
 
     // Write to the log file.
     p_logger_->flush();

@@ -130,15 +130,17 @@ public:
    * \brief Set a static position goal to follow.
    *
    * \param position_goal containing the static position goal to follow.
+   * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal);
+  void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition = false);
   
   /**
    * \brief Set a static velocity goal to follow.
    *
    * \param velocity_goal containing the static velocity goal to follow.
+   * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal);
+  void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition = false);
 
   /**
    * \brief Finish following a static goal.
@@ -378,15 +380,17 @@ private:
      * \brief Set a static position goal to follow.
      *
      * \param position_goal containing the static position goal to follow.
+     * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal);
+    void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
   
     /**
      * \brief Set a static velocity goal to follow.
      *
      * \param velocity_goal containing the static velocity goal to follow.
+     * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal);
+    void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
 
     /**
      * \brief Finish following a static goal.
@@ -400,7 +404,7 @@ private:
      *
      * \param p_progress for containing the execution progress.
      *
-     * \return bool indicating if the execution progress has been successfully retrieved or not.
+     * \return bool indicating if the execution progress has been recently updated or not.
      */
     bool retrieveExecutionProgress(wrapper::trajectory::ExecutionProgress* p_progress);
 
@@ -445,6 +449,7 @@ private:
         do_discard(false),
         do_ramp_down(false),
         do_static_goal_start(false),
+        do_static_goal_fast_update(false),
         do_static_position_goal_update(false),
         do_static_velocity_goal_update(false),
         do_static_goal_finish(false),
@@ -478,6 +483,11 @@ private:
         bool do_static_goal_start;
         
         /**
+         * \brief Flag indicating if the static goal should be updated fast.
+         */
+        bool do_static_goal_fast_update;
+
+        /**
          * \brief Flag indicating if the static position goal should be updated.
          */
         bool do_static_position_goal_update;
@@ -488,7 +498,7 @@ private:
         bool do_static_velocity_goal_update;
 
         /**
-         * \brief Flag indicating if static goal execution should be finished.
+         * \brief Flag indicating if the static goal execution should be finished.
          */
         bool do_static_goal_finish;
         
@@ -652,6 +662,7 @@ private:
       CONDITION(0.005),
       RAMP_DOWN_STOP_DURATION(1.0),
       STATIC_GOAL_DURATION(5.0),
+      STATIC_GOAL_DURATION_SHORT(0.1),
       condition_met_(true),
       configurations_(configurations)
       {}
@@ -689,15 +700,17 @@ private:
        * \brief Prepare for a static position goal.
        *
        * \param position_goal containing the static goal to follow.
+       * \param fast_transition indicating if a fast transition should be done.
        */
-      void prepareStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal);
+      void prepareStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
       
       /**
        * \brief Prepare for a static velocity goal.
        *
        * \param velocity_goal containing the static goal to follow.
+       * \param fast_transition indicating if a fast transition should be done.
        */
-      void prepareStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal);
+      void prepareStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
 
       /**
        * \brief Check if the goal conditions has been met.
@@ -840,6 +853,11 @@ private:
        */
       const double STATIC_GOAL_DURATION;
       
+      /**
+       * \brief Constant for static goal ramp in short duration [s].
+       */
+      const double STATIC_GOAL_DURATION_SHORT;
+
       /**
        * \brief Conditions for the interpolator.
        */

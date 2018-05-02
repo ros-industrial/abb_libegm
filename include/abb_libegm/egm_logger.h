@@ -55,9 +55,9 @@ public:
    * \brief A constructor.
    *
    * \param filename specifying the log's filename.
-   * \param description_header specifying an optional description header for the columns in the log.
+   * \param use_default_header specifying if the default headers should be used in the log.
    */
-  EGMLogger(const std::string& filename, const std::string& description_header = std::string());
+  EGMLogger(const std::string& filename, const bool use_default_headers = true);
   
   /**
    * \brief A destructor.
@@ -95,8 +95,9 @@ public:
    * \brief Add Cartesian velocity data to the log stream.
    *
    * \param velocity containing the velocity data to add.
+   * \param last indicating if it is the last addition to current the log event.
    */
-  void add(const wrapper::CartesianVelocity& velocity);
+  void add(const wrapper::CartesianVelocity& velocity, const bool last = false);
   
   /**
    * \brief Calculate the amount of time logged.
