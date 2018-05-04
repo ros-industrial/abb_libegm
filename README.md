@@ -7,3 +7,5 @@
 ## Overview
 
 A C++ library for interfacing with ABB robot controllers supporting Externally Guided Motion (689-1)
+
+See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion library that interfaces with RWS.
