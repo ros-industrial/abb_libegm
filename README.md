@@ -24,7 +24,7 @@ The following is a conceptual sketch of how this EGM library can be viewed, in r
 
 ### Requirements
 
-* RobotWare version between `6.0` and `6.06.01`, higher versions are to be considered incompatible at the moment.
+* RobotWare versions between `6.0` and `6.06.01` (higher versions are to be considered incompatible at the moment).
 * A license for the RobotWare option *Externally Guided Motion* (`689-1`).
 
 ### Dependencies
