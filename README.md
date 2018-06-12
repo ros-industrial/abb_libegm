@@ -8,11 +8,11 @@
 
 RobotWare 6.07 introduced major changes in the EGM communication protocol, and this library has not been updated to support those changes yet.
 
-**I.e. avoid using this library with RobotWare 6.07 at the moment.**
+**Avoid using this library with RobotWare 6.07 at the moment.**
 
 ## Overview
 
-A C++ library for interfacing with ABB robot controllers supporting Externally Guided Motion (EGM).
+A C++ library for interfacing with ABB robot controllers supporting Externally Guided Motion (EGM). See the Application manual - Controller software IRC5 for a detailed description of EGM.
 
 See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion library that interfaces with RWS.
 
@@ -20,12 +20,17 @@ See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion l
 
 The following is a conceptual sketch of how this EGM library can be viewed, in relation to an ABB robot controller as well as the RWS companion library mentioned above. 
 
-![EGM sketch](docs/images/egm_sketch.png)
+![EGM sketch](docs/images/egm_sketch.svg)
 
 ### Requirements
 
-* RobotWare 6.0 or higher.
+* RobotWare version between 6.0 and 6.06.01, higher versions are incompatible at the moment.
 * A license for the RobotWare option Externally Guided Motion [689-1].
+
+### Dependencies
+
+* [Boost C++ Libraries](https://www.boost.org/)
+* [Google Protocol Buffers](https://developers.google.com/protocol-buffers/)
 
 ### Limitations
 
@@ -35,6 +40,6 @@ This library is intended to be used with the UDP variant of EGM, and it supports
 
 ### Recommendations
 
-* The current version of this library is recommended to be used with **RobotWare 6.06.01**.
-* It is recommended to perform RobotStudio simulations before working with a real robot.
-* It is also recommended to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
+* This library has been verified to work with RobotWare 6.06.01. Other version are expected to work, but are not guaranteed at the moment.
+* It is a good idea to perform RobotStudio simulations before working with a real robot.
+* It is prudent to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
