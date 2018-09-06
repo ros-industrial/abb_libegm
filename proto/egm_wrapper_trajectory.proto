@@ -116,10 +116,20 @@ message StaticVelocityGoal
 // An execution progress for an EGM trajectory interface.
 message ExecutionProgress
 {
-  optional Input          inputs               = 1; // The latest inputs received from the robot controller.
-  optional Output         outputs              = 2; // The latest outputs sent to the robot controller.
-  optional double         time_passed          = 3; // The time [s] passed for the current goal.
-  optional PointGoal      goal                 = 4; // The current goal.
-  optional TrajectoryGoal active_trajectory    = 5; // The currently active trajectory (if any has been activated).
-  optional uint32         pending_trajectories = 6; // The number of pending trajectories in the queue.
+  enum State
+  {
+	UNDEFINED   = 0;
+    NORMAL      = 1;
+    RAMP_DOWN   = 2;
+    STATIC_GOAL = 3;
+  }
+  
+  optional State          state                = 1 [default = UNDEFINED];
+  optional Input          inputs               = 2; // The latest inputs received from the robot controller.
+  optional Output         outputs              = 3; // The latest outputs sent to the robot controller.
+  optional double         time_passed          = 4; // The time [s] passed for the current goal.
+  optional bool           goal_active          = 5; // Indicates if a goal is currently active or not.
+  optional PointGoal      goal                 = 6; // The current goal.
+  optional TrajectoryGoal active_trajectory    = 7; // The currently active trajectory (if any has been activated).
+  optional uint32         pending_trajectories = 8; // The number of pending trajectories in the queue.
 }

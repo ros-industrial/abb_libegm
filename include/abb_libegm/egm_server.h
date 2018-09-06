@@ -119,6 +119,11 @@ public:
    */
   ~EGMServer();
 
+  /**
+   * \brief Checks if the server was successfully initialized or not.
+   */
+  bool isInitialized() const;
+
 private:
   /**
    * \brief Start an asynchronous recieve.
@@ -170,6 +175,11 @@ private:
    * \brief Container for server data.
    */
   EGMServerData server_data_;
+
+  /**
+   * \brief Flag indicating if the server was initialized successfully or not.
+   */
+  bool initialized_;
 };
 
 } // end namespace egm

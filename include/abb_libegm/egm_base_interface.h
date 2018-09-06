@@ -71,6 +71,27 @@ public:
   EGMBaseInterface(boost::asio::io_service& io_service,
                    const unsigned short port_number,
                    const BaseConfiguration& configuration = BaseConfiguration());
+  
+  /**
+   * \brief Checks if the underlying server was successfully initialized or not.
+   *
+   * \return bool indicating if the underlying server was successfully initialized or not.
+   */
+  bool isInitialized();
+
+  /**
+   * \brief Checks if an EGM communication session is connected or not.
+   *
+   * \return bool indicating if a connection exists between the interface, and the robot controller's EGM client.
+   */
+  bool isConnected();
+
+  /**
+   * \brief Retrive the most recently received EGM status message.
+   *
+   * \return wrapper::Status containing the most recently received EGM status message.
+   */
+  wrapper::Status getStatus();
 
   /**
    * \brief Retrive the interface's current configuration.
@@ -344,6 +365,27 @@ protected:
   };
 
   /**
+   * \brief Struct for containing data regarding an active EGM communication session.
+   */
+  struct SessionData
+  {
+    /**
+     * \brief Container for the most recently received EGM header message.
+     */
+    wrapper::Header header;
+
+    /**
+     * \brief Container for the most recently received EGM status message.
+     */
+    wrapper::Status status;
+
+    /**
+     * \brief Mutex for protecting the session data.
+     */
+    boost::mutex mutex;
+  };
+
+  /**
    * \brief Struct for containing the base configuration data.
    */
   struct BaseConfigurationContainer
@@ -400,6 +442,11 @@ protected:
   bool initializeCallback(const EGMServerData& server_data);
 
   /**
+   * \brief Static constant wait time [ms] used when determining if a connection has been established or not.
+   */
+  static const unsigned int WAIT_TIME_MS = 100;
+
+  /**
    * \brief Container for the inputs, to the interface, from the EGM server.
    */
   InputContainer inputs_;
@@ -408,6 +455,11 @@ protected:
    * \brief Container for the outputs, from the interface, to the EGM server.
    */
   OutputContainer outputs_;
+
+  /**
+   * \brief Container for session data (most recently received header and status messages).
+   */
+  SessionData session_data_;
 
   /**
    * \brief Logger, for logging EGM messages to a CSV file.

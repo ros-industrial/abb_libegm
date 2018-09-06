@@ -50,6 +50,7 @@ EGMServer::EGMServer(boost::asio::io_service& io_service,
                      unsigned short port_number,
                      AbstractEGMInterface* p_egm_interface)
 :
+initialized_(false),
 p_egm_interface_(p_egm_interface)
 {
   bool success = true;
@@ -68,6 +69,7 @@ p_egm_interface_(p_egm_interface)
 
   if (success)
   {
+    initialized_ = true;
     startAsynchronousRecieve();
   }
 }
@@ -79,6 +81,11 @@ EGMServer::~EGMServer()
     p_socket_->close();
     p_socket_.reset();
   }
+}
+
+bool EGMServer::isInitialized() const
+{
+  return initialized_;
 }
 
 void EGMServer::startAsynchronousRecieve()

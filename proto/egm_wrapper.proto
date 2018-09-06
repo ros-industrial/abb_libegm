@@ -90,9 +90,14 @@ message JointSpace
 //
 // Cartesian space related messages.
 //
-// Note: Interpreted relative to the sensor frame defined
-//       when setting up EGM with RAPID instructions.
-//       E.g. with the EGMActPose RAPID instruction.
+// Note 1: Messages from the robot controller are relative
+//         to the work object specified when setting up EGM.
+//         E.g. with the EGMActPose RAPID instruction.
+//
+// Note 2: Messages to the robot controller are interpreted
+//         relative to the sensor frame defined when setting
+//         up EGM. E.g. with the EGMActPose RAPID
+//         instruction.
 //
 //===========================================================
 
@@ -111,7 +116,7 @@ message Euler
   optional double z = 3;
 }
 
-// Note: Lower priority than Euler angles.
+// Note: Lower priority than Euler angles. The quaternion is defined as: u0 + u1*i + u2*j + u3*k.
 message Quaternion
 {
   optional double u0 = 1;

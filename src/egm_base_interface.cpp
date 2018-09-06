@@ -668,7 +668,10 @@ configuration_(configuration)
 
 const std::string& EGMBaseInterface::callback(const EGMServerData& server_data)
 {
-  // Initialize the callback.
+  // Initialize the callback by:
+  // - Parsing and extracting data from the recieved message.
+  // - Updating any pending configuration changes.
+  // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
     // Handle demo execution.
@@ -746,6 +749,7 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
   // Update configuration, if requested to do so.
   if (success && inputs_.first_message())
   {
+    // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
     boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
     if (configuration_.has_pending_update)
@@ -759,6 +763,14 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
   if (success)
   {
     success = inputs_.extractParsedInformation(configuration_.active.axes);
+
+    // Update the session data.
+    if (success)
+    {
+      // Lock the interface's session data mutex. It is released when the lock goes out of scope.
+      session_data_.header.CopyFrom(inputs_.current().header());
+      session_data_.status.CopyFrom(inputs_.current().status());
+    }
   }
 
   // Prepare the outputs.
@@ -774,6 +786,49 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
 /************************************************************
  * User interaction methods
  */
+
+bool EGMBaseInterface::isInitialized()
+{
+  return egm_server_.isInitialized();
+}
+
+bool EGMBaseInterface::isConnected()
+{
+  wrapper::Header header_1;
+  wrapper::Header header_2;
+
+  {
+    // Lock the interface's session data mutex. It is released when the lock goes out of scope.
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_1.CopyFrom(session_data_.header);
+  }
+
+  boost::this_thread::sleep(boost::posix_time::milliseconds(WAIT_TIME_MS));
+
+  {
+    // Lock the interface's session data mutex. It is released when the lock goes out of scope.
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_2.CopyFrom(session_data_.header);
+  }
+
+  return (header_1.has_sequance_number() && header_1.has_time_stamp()) &&
+         (header_2.has_sequance_number() && header_2.has_time_stamp()) &&
+         (header_2.sequance_number() > header_1.sequance_number()) &&
+         (header_2.time_stamp() - header_1.time_stamp() <= 2 * WAIT_TIME_MS);
+};
+
+wrapper::Status EGMBaseInterface::getStatus()
+{
+  wrapper::Status status;
+
+  {
+    // Lock the interface's session data mutex. It is released when the lock goes out of scope.
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    status.CopyFrom(session_data_.status);
+  }
+
+  return status;
+};
 
 BaseConfiguration EGMBaseInterface::getConfiguration()
 {

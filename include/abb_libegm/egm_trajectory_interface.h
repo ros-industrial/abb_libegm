@@ -96,7 +96,8 @@ public:
   /**
    * \brief Stop the trajectory motion execution.
    *
-   * Note: A resume normally needs to be ordered for execution to start again.
+   * Note: The intention is to only use this for short temporary stops, for long stops it is recommended to stop the
+   *       EGM communication session completely. A resume normally needs to be ordered for execution to start again.
    *
    * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
    */
@@ -534,7 +535,7 @@ private:
       sub_state(None),
       has_updated_execution_progress(false)
       {}
-            
+
       /**
        * \brief Flag indicating if there is a new goal.
        *
@@ -1057,6 +1058,13 @@ private:
      * \brief Store the current goal, in the front of the currently active trajectory.
      */
     void storeNormalGoal();
+
+    /**
+     * \brief Maps the current internal state to an execution progress state.
+     *
+     * \return ExecutionProgress_State with the execution progress state.
+     */
+    wrapper::trajectory::ExecutionProgress_State mapCurrentState();
 
     /**
      * \brief Constant for the minimum duration scale factor.

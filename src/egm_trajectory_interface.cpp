@@ -665,8 +665,10 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
   // Update the execution progress.
   if(p_outputs)
   {
+    data_.execution_progress.set_state(mapCurrentState());
     data_.execution_progress.mutable_inputs()->CopyFrom(inputs.current());
     data_.execution_progress.mutable_outputs()->CopyFrom(*p_outputs);
+    data_.execution_progress.set_goal_active(data_.has_active_goal);
     data_.execution_progress.mutable_goal()->CopyFrom(motion_step_.internal_goal);
     data_.execution_progress.set_time_passed(motion_step_.data.time_passed);
     data_.execution_progress.clear_active_trajectory();
@@ -747,9 +749,12 @@ void EGMTrajectoryInterface::TrajectoryMotion::prepareDecisionData()
   }
 
   // Reset the resume flag (i.e. ignore resume order if no stop order has occurred).
-  if (!data_.pending_events.do_stop)
+  if (!data_.pending_events.do_static_goal_finish)
   {
-    data_.pending_events.do_resume = false;
+    if (!data_.pending_events.do_stop)
+    {
+      data_.pending_events.do_resume = false;
+    }
   }
 
   // Reset the static goal finish flag (i.e. ignore finish order if no static goal order has been started).
@@ -977,6 +982,28 @@ void EGMTrajectoryInterface::TrajectoryMotion::storeNormalGoal()
   }
 }
 
+wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryMotion::mapCurrentState()
+{
+  wrapper::trajectory::ExecutionProgress_State temp = wrapper::trajectory::ExecutionProgress_State_UNDEFINED;
+
+  switch (data_.state)
+  {
+    case Normal:
+      temp = wrapper::trajectory::ExecutionProgress_State_NORMAL;
+    break;
+
+    case RampDown:
+      temp = wrapper::trajectory::ExecutionProgress_State_RAMP_DOWN;
+    break;
+
+    case StaticGoal:
+      temp = wrapper::trajectory::ExecutionProgress_State_STATIC_GOAL;
+    break;
+  }
+
+  return temp;
+}
+
 /************************************************************
  * User interaction methods
  */
@@ -1135,7 +1162,10 @@ trajectory_motion_(configuration)
 
 const std::string& EGMTrajectoryInterface::callback(const EGMServerData& server_data)
 {
-  // Initialize the callback.
+  // Initialize the callback by:
+  // - Parsing and extracting data from the recieved message.
+  // - Updating any pending configuration changes.
+  // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
     // Handle demo execution or trajectory execution.
@@ -1201,7 +1231,15 @@ bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data
   // Extract information from the parsed message. 
   if (success)
   {
-    success = inputs_.extractParsedInformation(configuration_.active.base.axes);    
+    success = inputs_.extractParsedInformation(configuration_.active.base.axes);
+
+    // Update the session data.
+    if (success)
+    {
+      // Lock the interface's session data mutex. It is released when the lock goes out of scope.
+      session_data_.header.CopyFrom(inputs_.current().header());
+      session_data_.status.CopyFrom(inputs_.current().status());
+    }
   }
 
   // Prepare the outputs.
