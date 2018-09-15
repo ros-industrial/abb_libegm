@@ -57,15 +57,10 @@ set(SRC_FILES
     src/egm_trajectory_interface.cpp
     ${EgmProtoSources})
 
-include_directories(include
-                    ${CMAKE_CURRENT_BINARY_DIR} # Contains protobuf generated sources
-                    ${Boost_INCLUDE_DIRS}
-                    ${PROTOBUF_INCLUDE_DIRS}
-                    ${catkin_INCLUDE_DIRS})
-
 add_library(${PROJECT_NAME} ${SRC_FILES})
-target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_BINARY_DIR})
-target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES} ${catkin_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>")
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROTOBUF_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} ${Boost_LIBRARIES} ${PROTOBUF_LIBRARIES})
 
 #############
 ## Install ##
