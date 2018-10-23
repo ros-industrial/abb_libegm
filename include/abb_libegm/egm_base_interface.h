@@ -87,7 +87,7 @@ public:
   bool isConnected();
 
   /**
-   * \brief Retrive the most recently received EGM status message.
+   * \brief Retrieve the most recently received EGM status message.
    *
    * \return wrapper::Status containing the most recently received EGM status message.
    */
