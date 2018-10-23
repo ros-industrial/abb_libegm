@@ -126,7 +126,7 @@ public:
 
 private:
   /**
-   * \brief Start an asynchronous recieve.
+   * \brief Start an asynchronous receive.
    */
   void startAsynchronousRecieve();
 
