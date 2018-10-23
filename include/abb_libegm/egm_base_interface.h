@@ -94,7 +94,7 @@ public:
   wrapper::Status getStatus();
 
   /**
-   * \brief Retrive the interface's current configuration.
+   * \brief Retrieve the interface's current configuration.
    *
    * \return BaseConfiguration containing the current configurations for the interface.
    */
