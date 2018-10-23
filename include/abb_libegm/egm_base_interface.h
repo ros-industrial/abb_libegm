@@ -89,6 +89,14 @@ public:
   /**
    * \brief Retrieve the most recently received EGM status message.
    *
+   * The returned status depends on the EGM communication session(s):
+   * - If no session has been active, then an empty status message is returned.
+   * - If a session is active, then the most recently received status message is returned.
+   * - If any session has been active, then the last status message from the latest session is returned.
+   *
+   * Note: EGMAct RAPID instructions specifies the frequency of EGM messages, and this affects how often
+   *       the status is updated when a communication session is active.
+   *
    * \return wrapper::Status containing the most recently received EGM status message.
    */
   wrapper::Status getStatus();
@@ -443,6 +451,8 @@ protected:
 
   /**
    * \brief Static constant wait time [ms] used when determining if a connection has been established or not.
+   *
+   * I.e. a connection between the interface's EGM server, and a robot controller's EGM client.
    */
   static const unsigned int WAIT_TIME_MS = 100;
 

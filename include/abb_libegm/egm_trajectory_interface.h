@@ -1060,7 +1060,13 @@ private:
     void storeNormalGoal();
 
     /**
-     * \brief Maps the current internal state to an execution progress state.
+     * \brief Maps the interface's current internal state to an execution progress state.
+     *
+     * The interface can be in any of the following states:
+     * - Undefined state (should not occur).
+     * - Normal state (references are generated from trajectories specified by a user).
+     * - Ramp down state (ramping down any current references).
+     * - Static goal state (references are generated from a single goal point specified by a user).
      *
      * \return ExecutionProgress_State with the execution progress state.
      */

@@ -63,7 +63,7 @@ struct EGMServerData
   size_t port_number;
 
   /**
-   * \brief The recieved data.
+   * \brief The received data.
    */
   char* p_data;
 
@@ -97,7 +97,7 @@ private:
 /**
  * \brief Class for an Externally Guided Motion (EGM) asynchronous UDP server.
  *
- * The server recieves EGM messages from an ABB robot controller (that is running an EGM motion),
+ * The server receives EGM messages from an ABB robot controller (that is running an EGM motion),
  * and then the server replies with EGM messages containing the new references for the robot.
  */
 class EGMServer
@@ -108,7 +108,7 @@ public:
    *
    * \param io_service for operating boost asio's asynchronous functions.
    * \param port_number for the server's UDP socket.
-   * \param p_egm_interface that processes the recieved messages.
+   * \param p_egm_interface that processes the received messages.
    */
   EGMServer(boost::asio::io_service& io_service,
             unsigned short port_number,
@@ -128,15 +128,15 @@ private:
   /**
    * \brief Start an asynchronous receive.
    */
-  void startAsynchronousRecieve();
+  void startAsynchronousReceive();
 
   /**
-   * \brief Callback for handling an asynchronous recieve.
+   * \brief Callback for handling an asynchronous receive.
    *
    * \param error for containing an error code.
-   * \param bytes_transferred is the number of bytes recieved.
+   * \param bytes_transferred is the number of bytes received.
    */
-  void recieveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred);
+  void receiveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred);
 
   /**
    * \brief Callback for handling an asynchronous send.
@@ -164,10 +164,10 @@ private:
   /**
    * \brief A buffer for storing the server's serialized inbound messages (i.e. the robot's outbound messages).
    */
-  char recieve_buffer_[BUFFER_SIZE];
+  char receive_buffer_[BUFFER_SIZE];
   
   /**
-   * \brief A pointer to an object that is derived from AbstractEGMInterface, which processes the recieved messages.
+   * \brief A pointer to an object that is derived from AbstractEGMInterface, which processes the received messages.
    */
   AbstractEGMInterface* p_egm_interface_;
 

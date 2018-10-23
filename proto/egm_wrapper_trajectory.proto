@@ -118,7 +118,7 @@ message ExecutionProgress
 {
   enum State
   {
-	UNDEFINED   = 0;
+    UNDEFINED   = 0;
     NORMAL      = 1;
     RAMP_DOWN   = 2;
     STATIC_GOAL = 3;

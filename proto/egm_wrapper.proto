@@ -25,7 +25,7 @@ message Header
     DATA      = 1; // Message contains data sent by the robot controller.
   }
 
-  optional uint32      sequance_number = 1; // Sequence number (to be able to detect lost messages).
+  optional uint32      sequence_number = 1; // Sequence number (to be able to detect lost messages).
   optional uint32      time_stamp      = 2; // Time stamp in milliseconds.
   optional MessageType message_type    = 3 [default = UNDEFINED];
 }
@@ -90,14 +90,14 @@ message JointSpace
 //
 // Cartesian space related messages.
 //
-// Note 1: Messages from the robot controller are relative
-//         to the work object specified when setting up EGM.
-//         E.g. with the EGMActPose RAPID instruction.
+// Note 1: Cartesian messages from the robot controller are
+//         relative to the work object specified when setting
+//         up EGM. E.g. with EGMActPose RAPID instructions.
 //
-// Note 2: Messages to the robot controller are interpreted
-//         relative to the sensor frame defined when setting
-//         up EGM. E.g. with the EGMActPose RAPID
-//         instruction.
+// Note 2: Cartesian messages to the robot controller are
+//         interpreted relative to the sensor frame defined
+//         when setting up EGM. E.g. with EGMActPose RAPID
+//         instructions.
 //
 //===========================================================
 

@@ -70,7 +70,7 @@ p_egm_interface_(p_egm_interface)
   if (success)
   {
     initialized_ = true;
-    startAsynchronousRecieve();
+    startAsynchronousReceive();
   }
 }
 
@@ -88,27 +88,27 @@ bool EGMServer::isInitialized() const
   return initialized_;
 }
 
-void EGMServer::startAsynchronousRecieve()
+void EGMServer::startAsynchronousReceive()
 {
   if (p_socket_)
   {
-    p_socket_->async_receive_from(boost::asio::buffer(recieve_buffer_),
+    p_socket_->async_receive_from(boost::asio::buffer(receive_buffer_),
                                   remote_endpoint_,
-                                  boost::bind(&EGMServer::recieveCallback,
+                                  boost::bind(&EGMServer::receiveCallback,
                                               this,
                                               boost::asio::placeholders::error,
                                               boost::asio::placeholders::bytes_transferred));
   }
 }
 
-void EGMServer::recieveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred)
+void EGMServer::receiveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred)
 {
-  server_data_.p_data = recieve_buffer_;
+  server_data_.p_data = receive_buffer_;
   server_data_.bytes_transferred = (int) bytes_transferred;
   
   if (error == boost::system::errc::success && p_egm_interface_)
   {
-    // Process the recieved data via the callback method (creates the reply message).
+    // Process the received data via the callback method (creates the reply message).
     const std::string& reply = p_egm_interface_->callback(server_data_);
 
     if (!reply.empty() && p_socket_)
@@ -124,7 +124,7 @@ void EGMServer::recieveCallback(const boost::system::error_code& error, const st
   }
 
   // Add another asynchrous operation to the boost io_service object.
-  startAsynchronousRecieve();
+  startAsynchronousReceive();
 }
 
 void EGMServer::sendCallback(const boost::system::error_code& error, const std::size_t bytes_transferred) {}
