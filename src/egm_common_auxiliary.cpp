@@ -563,7 +563,7 @@ bool parse(wrapper::Header* p_target, const EgmHeader& source)
 
   if (p_target && source.has_seqno() && source.has_tm() && source.has_mtype())
   {
-    p_target->set_sequance_number(source.seqno());
+    p_target->set_sequence_number(source.seqno());
     p_target->set_time_stamp(source.tm());
 
     switch (source.mtype())

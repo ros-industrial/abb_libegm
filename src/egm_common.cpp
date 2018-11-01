@@ -55,7 +55,7 @@ const unsigned short RobotController::DEFAULT_PORT_NUMBER = 6511;
 const int RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS = 6;
 const int RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS = 6;
 const int RobotController::MAX_NUMBER_OF_JOINTS = RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS +
-                                                     RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS;
+                                                  RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS;
 
 const double Constants::Conversion::RAD_TO_DEG = 180.0 / M_PI;
 const double Constants::Conversion::DEG_TO_RAD = M_PI / 180.0;

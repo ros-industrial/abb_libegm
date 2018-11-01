@@ -668,7 +668,10 @@ configuration_(configuration)
 
 const std::string& EGMBaseInterface::callback(const EGMServerData& server_data)
 {
-  // Initialize the callback.
+  // Initialize the callback by:
+  // - Parsing and extracting data from the recieved message.
+  // - Updating any pending configuration changes.
+  // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
     // Handle demo execution.
@@ -759,6 +762,22 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
   if (success)
   {
     success = inputs_.extractParsedInformation(configuration_.active.axes);
+
+    {
+      boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+
+      // Update the session data.
+      if (success)
+      {
+        session_data_.header.CopyFrom(inputs_.current().header());
+        session_data_.status.CopyFrom(inputs_.current().status());
+      }
+      else
+      {
+        session_data_.header.Clear();
+        session_data_.status.Clear();
+      }
+    }
   }
 
   // Prepare the outputs.
@@ -775,9 +794,55 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
  * User interaction methods
  */
 
+bool EGMBaseInterface::isInitialized()
+{
+  return egm_server_.isInitialized();
+}
+
+bool EGMBaseInterface::isConnected()
+{
+  wrapper::Header header_1;
+  wrapper::Header header_2;
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_1.CopyFrom(session_data_.header);
+  }
+
+  boost::this_thread::sleep(boost::posix_time::milliseconds(WAIT_TIME_MS));
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_2.CopyFrom(session_data_.header);
+  }
+
+  // Check for if an EGM communication session is connected or not. This is determined by comparing
+  // two header messages, received at two different time instances, according to:
+  // 1. Both headers must have a sequence number and a time stamp.
+  // 2. The sequence number of the second header must be larger than that of the first header.
+  // 3. The time stamp of the second header must be larger than that of the first header.
+  // 4. The difference in time stamp must be near the wait time.
+  return (header_1.has_sequence_number() && header_1.has_time_stamp()) &&
+         (header_2.has_sequence_number() && header_2.has_time_stamp()) &&
+         (header_2.sequence_number() > header_1.sequence_number()) &&
+         (header_2.time_stamp() > header_1.time_stamp()) &&
+         (header_2.time_stamp() - header_1.time_stamp() <= 2 * WAIT_TIME_MS);
+};
+
+wrapper::Status EGMBaseInterface::getStatus()
+{
+  wrapper::Status status;
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    status.CopyFrom(session_data_.status);
+  }
+
+  return status;
+};
+
 BaseConfiguration EGMBaseInterface::getConfiguration()
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   return configuration_.update;
@@ -785,7 +850,6 @@ BaseConfiguration EGMBaseInterface::getConfiguration()
 
 void EGMBaseInterface::setConfiguration(const BaseConfiguration& configuration)
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   configuration_.update = configuration;
