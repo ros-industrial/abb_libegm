@@ -14,7 +14,6 @@ find_package(Protobuf REQUIRED)
 # export the dependency on pthread using the CFG_EXTRAS files
 list (REMOVE_ITEM PROTOBUF_LIBRARIES "-lpthread")
 
-
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
 find_program(Protobuf_PROTOC_LOC NAMES protoc)
 if (NOT Protobuf_PROTOC_LOC)

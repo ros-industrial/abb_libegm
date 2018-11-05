@@ -10,6 +10,8 @@
 
   <author email="jon.tjerngren@se.abb.com">Jon Tjerngren</author>
 
+  <url type="repository">https://github.com/ros-industrial/abb_libegm</url>
+
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>boost</build_depend>
