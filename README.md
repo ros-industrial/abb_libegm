@@ -61,6 +61,6 @@ The ROSIN project has received funding from the European Union's Horizon 2020 re
 The opinions expressed reflects only the author's view and reflects in no way the European Commission's opinions.
 The European Commission is not responsible for any use that may be made of the contained information.
 
-### Special thanks
+### Special Thanks
 
 Special thanks to [gavanderhoorn](https://github.com/gavanderhoorn) for guidance with open-source practices and ROS-Industrial conventions.
