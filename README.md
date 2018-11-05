@@ -18,7 +18,7 @@ See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion l
 
 ### Sketch
 
-The following is a conceptual sketch of how this EGM library can be viewed, in relation to an ABB robot controller as well as the RWS companion library mentioned above. 
+The following is a conceptual sketch of how this EGM library can be viewed, in relation to an ABB robot controller as well as the RWS companion library mentioned above.
 
 ![EGM sketch](docs/images/egm_sketch.svg)
 
@@ -36,11 +36,31 @@ The following is a conceptual sketch of how this EGM library can be viewed, in r
 
 This library is intended to be used with the UDP variant of EGM, and it supports the following EGM modes:
 
- * Joint Mode
- * Pose Mode
+* Joint Mode
+* Pose Mode
 
 ### Recommendations
 
- * This library has been verified to work with RobotWare `6.06.01`. Other version are expected to work, but this cannot be guaranteed at the moment.
- * It is a good idea to perform RobotStudio simulations before working with a real robot.
- * It is prudent to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
+* This library has been verified to work with RobotWare `6.06.01`. Other version are expected to work, but this cannot be guaranteed at the moment.
+* It is a good idea to perform RobotStudio simulations before working with a real robot.
+* It is prudent to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
+* Consider cyber security aspects, before connecting robot controllers to networks.
+
+## Acknowledgements
+
+The **core development** has been supported by the European Union's Horizon 2020 project [SYMBIO-TIC](http://www.symbio-tic.eu/).
+The SYMBIO-TIC project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement no. 637107.
+
+<img src="docs/images/symbio_tic_logo.png" width="250">
+
+The **open-source process** has been supported by the European Union's Horizon 2020 project [ROSIN](http://rosin-project.eu/).
+The ROSIN project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement no. 732287.
+
+<img src="docs/images/rosin_logo.png" width="250">
+
+The opinions expressed reflects only the author's view and reflects in no way the European Commission's opinions.
+The European Commission is not responsible for any use that may be made of the contained information.
+
+### Special thanks
+
+Special thanks to [gavanderhoorn](https://github.com/gavanderhoorn) for guidance with open-source practices and ROS-Industrial conventions.
