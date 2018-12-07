@@ -66,7 +66,9 @@ The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controll
 
 The RAPID modules and configurations constitutes a customizable, ready to run, RAPID program, which contains a state machine implementation. Each motion task in the robot system receives its own state machine instance, and the intention is to use this in combination with external systems that require interaction with the robot(s). The following is a conceptual sketch of the RAPID program's execution flow.
 
-![StateMachine Add-In sketch](docs/images/statemachine_addin_sketch.png)
+<p align="center">
+  <img src="docs/images/statemachine_addin_sketch.png" width="600">
+</p>
 
 To install the Add-In:
 
