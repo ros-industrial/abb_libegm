@@ -49,7 +49,7 @@ This library is intended to be used with the UDP variant of EGM, and it supports
 
 ## Usage Hints
 
-This library is generic and can be used together with any RAPID program, which is using the RAPID *EGMRunJoint* and/or *EGMRunPose* instructions, and system configurations. The library's primary classes are:
+This is a generic library which can be used together with any RAPID program which is using the RAPID `EGMRunJoint` and/or `EGMRunPose` instructions, and system configurations. The library's primary classes are:
 
 * [EGMServer](include/abb_libegm/egm_server.h): Sets up and manages asynchronous UDP communication loops. During an EGM communication session, the robot controller requests new references, at the rate specified with RAPID *EGMAct* instructions. When an *EGMServer* instance receives an EGM message from the robot controller, then the message is passed on to an EGM interface instance (see below). The interface provides the reply message, containing the new references, which the server then sends back to the robot controller.
 * [AbstractEGMInterface](include/abb_libegm/egm_server.h): An abstract interface, which specifies how the *EGMServer* class interacts with EGM interfaces. Can be inherited from to implement custom EGM interfaces.
