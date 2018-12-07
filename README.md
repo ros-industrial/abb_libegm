@@ -59,7 +59,7 @@ This is a generic library which can be used together with any RAPID program whic
 
 The optional *StateMachine Add-In* for RobotWare can be used in combination with any of the classes above.
 
-### [Optional] StateMachine Add-In
+### StateMachine Add-In [Optional]
 
 The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controllers. It is made for both *real physical controllers* and *virtual controllers* simulated in RobotStudio. If the Add-In is selected during a RobotWare system installation, then the Add-In will load several RAPID modules and system configurations based on the system specifications (e.g. number of robots and present options).
 
