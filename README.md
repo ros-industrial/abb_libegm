@@ -63,7 +63,7 @@ The optional *StateMachine Add-In* for RobotWare can be used in combination with
 
 The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controllers. It is made for both *real physical controllers* and *virtual controllers* simulated in RobotStudio. If the Add-In is selected during a RobotWare system installation, then the Add-In will load several RAPID modules and system configurations based on the system specifications (e.g. number of robots and present options).
 
-Retrieve the Add-In via RobotStudio by:
+To install the Add-In:
 
 1. Go to the *Add-Ins* tab in RobotStudio.
 2. Search for *StateMachine Add-In* in the *RobotApps* window.
