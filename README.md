@@ -55,7 +55,7 @@ This is a generic library which can be used together with any RAPID program whic
 * [AbstractEGMInterface](include/abb_libegm/egm_server.h): An abstract interface, which specifies how the `EGMServer` class interacts with EGM interfaces. Can be inherited from to implement custom EGM interfaces.
 * [EGMBaseInterface](include/abb_libegm/egm_base_interface.h): Inherits from `AbstractEGMInterface`, encapsulates an `EGMServer` instance, and implements a basic EGM interface. Can be configured to use demo references, which are intended for testing that EGM communication channels works.
 * [EGMControllerInterface](include/abb_libegm/egm_controller_interface.h): Inherits from `EGMBaseInterface` and implements an EGM interface variant for execution inside an external control loop that needs to be implemented by the user. Provides interaction methods, which can be used inside external control loops to affect EGM communication sessions.
-* [EGMTrajectoryInterface](include/abb_libegm/egm_trajectory_interface.h): Inherits from *EGMBaseInterface* and implements an EGM interface variant for execution of a queue of trajectories. Provides interaction methods, which can be called by a user to for example add trajectories to the queue and to stop/resume the trajectory execution.
+* [EGMTrajectoryInterface](include/abb_libegm/egm_trajectory_interface.h): Inherits from `EGMBaseInterface` and implements an EGM interface variant for execution of a queue of trajectories. Provides interaction methods, which can be called by a user to for example add trajectories to the queue and to stop/resume the trajectory execution.
 
 The optional *StateMachine Add-In* can be used in combination with any of the classes above.
 
