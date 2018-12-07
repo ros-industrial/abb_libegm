@@ -71,7 +71,7 @@ To install the Add-In:
 4. Verify that the Add-In was added to the list *Installed Packages*.
 5. The Add-In should appear as an option during the installation of a RobotWare system.
 
-See the Add-In's [user manual](https://robotapps.blob.core.windows.net/appreferences/docs/2093c0e8-d469-4188-bdd2-ca42e27cba5cUserManual.pdf) for more details, as well as install instructions for RobotWare systems.
+See the Add-In's [user manual](https://robotapps.blob.core.windows.net/appreferences/docs/2093c0e8-d469-4188-bdd2-ca42e27cba5cUserManual.pdf) for more details, as well as for install instructions for RobotWare systems.
 
 #### Notes
 
