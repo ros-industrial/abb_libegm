@@ -8,7 +8,7 @@
 
 RobotWare `6.07` introduced major changes in the EGM communication protocol, and this library has not been updated to support those changes yet.
 
-**Avoid using this library with RobotWare 6.07 at the moment.**
+**Avoid using this library with RobotWare 6.07 (or newer) at the moment.**
 
 ## Overview
 
@@ -43,13 +43,14 @@ This library is intended to be used with the UDP variant of EGM, and it supports
 ### Recommendations
 
 * This library has been verified to work with RobotWare `6.06.01`. Other versions are expected to work, but this cannot be guaranteed at the moment.
+  * **Avoid using this library with RobotWare 6.07 (or newer) at the moment.** See the `Important Note` section for more info.
 * It is a good idea to perform RobotStudio simulations before working with a real robot.
 * It is prudent to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
 * Consider cyber security aspects, before connecting robot controllers to networks.
 
 ## Usage Hints
 
-This is a generic library which can be used together with any RAPID program which is using the RAPID `EGMRunJoint` and/or `EGMRunPose` instructions, and system configurations. The library's primary classes are:
+This is a generic library, which can be used together with any RAPID program which is using the RAPID `EGMRunJoint` and/or `EGMRunPose` instructions, and system configurations. The library's primary classes are:
 
 * [EGMServer](include/abb_libegm/egm_server.h): Sets up and manages asynchronous UDP communication loops. During an EGM communication session, the robot controller requests new references, at the rate specified with RAPID `EGMAct` instructions. When an `EGMServer` instance receives an EGM message from the robot controller the message is passed on to an EGM interface instance (see below). The interface is expected to generate the reply message, containing the new references, which the server then sends back to the robot controller.
 * [AbstractEGMInterface](include/abb_libegm/egm_server.h): An abstract interface, which specifies how the `EGMServer` class interacts with EGM interfaces. Can be inherited from to implement custom EGM interfaces.
@@ -62,6 +63,10 @@ The optional *StateMachine Add-In* for RobotWare can be used in combination with
 ### StateMachine Add-In [Optional]
 
 The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controllers. It is made for both *real physical controllers* and *virtual controllers* simulated in RobotStudio. If the Add-In is selected during a RobotWare system installation, then the Add-In will load several RAPID modules and system configurations based on the system specifications (e.g. number of robots and present options).
+
+The RAPID modules and configurations constitutes a customizable, ready to run, RAPID program, which contains a state machine implementation. Each motion task in the robot system receives its own state machine instance, and the intention is to use this in combination with external systems that require interaction with the robot(s). The following is a conceptual sketch of the RAPID program's execution flow.
+
+![StateMachine Add-In sketch](docs/images/statemachine_addin_sketch.png)
 
 To install the Add-In:
 
