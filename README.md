@@ -75,7 +75,7 @@ See the Add-In's [user manual](https://robotapps.blob.core.windows.net/apprefere
 
 #### Notes
 
-If the EGM option is selected during system installation, then the Add-In will load RAPID code for using *EGMRunJoint* and *EGMRunPose* RAPID instructions. System configurations will also be loaded, and it is important to update the robot controller's EGM configurations. Especially the *Remote Address* and *Remote Port Number* configurations, under the *Transmission Protocol* topic, are vital to edit so that the robot controller will send EGM messages to the correct external destination. The configurations can be found in RobotStudio -> Controller tab -> Configuration -> Communication -> Transmission Protocol -> Edit each *ROB_X* instances. There will be one instance for each robot in the system.
+If the EGM option is selected during system installation, then the Add-In will load RAPID code for using `EGMRunJoint` and `EGMRunPose` RAPID instructions. System configurations will also be loaded, and it is important to update the robot controller's EGM configurations. Especially the *Remote Address* and *Remote Port Number* configurations, under the *Transmission Protocol* topic, are vital to edit so that the robot controller will send EGM messages to the correct host address. This configuration can be found in RobotStudio -> Controller tab -> Configuration -> Communication -> Transmission Protocol -> Edit each `ROB_X` instance. There will be one instance for each robot in the system.
 
 The RWS companion library contain a class specifically designed to interact with the Add-In. For example, to control the RAPID program by starting/stopping EGM communication sessions.
 
