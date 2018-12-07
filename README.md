@@ -19,7 +19,7 @@ A C++ library for interfacing with ABB robot controllers supporting *Externally 
 
 ### Sketch
 
-The following is a conceptual sketch of how this EGM library can be viewed, in relation to an ABB robot controller as well as the RWS companion library mentioned above. The optional *StateMachine Add-In* is related to the robot controller's RAPID program and system configurations.
+The following is a conceptual sketch of how this EGM library can be viewed, in relation to an ABB robot controller as well as the RWS companion library mentioned above. The optional *StateMachine Add-In* is related to the robot controller's RAPID program and system configuration.
 
 ![EGM sketch](docs/images/egm_sketch.png)
 
