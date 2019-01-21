@@ -47,7 +47,7 @@ namespace egm
  * \brief Class for an EGM contoller user interface.
  *
  * The class provides behavior for motion control, and this includes:
- * - Processing asynchronous callbacks from an EGM server.
+ * - Processing asynchronous callbacks from an UDP server.
  * - Notifying an external control loop about new messages.
  * - Incorporating external control loop inputs, and sending them to the robot controller.
  *
@@ -198,13 +198,13 @@ private:
   };
   
   /**
-   * \brief Handle callback requests from an EGM server.
+   * \brief Handle callback requests from an UDP server.
    *
-   * \param server_data containing the EGM server's callback data.
+   * \param server_data containing the UDP server's callback data.
    *
    * \return string& containing the reply.
    */
-  const std::string& callback(const EGMServerData& server_data);
+  const std::string& callback(const UDPServerData& server_data);
   
   /**
    * \brief The interface's controller motion data (between internal loop and external controller loop).

@@ -34,8 +34,8 @@
  ***********************************************************************************************************************
  */
 
-#ifndef EGM_SERVER_H
-#define EGM_SERVER_H
+#ifndef EGM_UDP_SERVER_H
+#define EGM_UDP_SERVER_H
 
 #include <boost/asio.hpp>
 
@@ -44,14 +44,14 @@ namespace abb
 namespace egm
 { 
 /**
- * \brief Struct for containing the Externally Guided Motion (EGM) server's data.
+ * \brief Struct for containing data from the UDPServer class.
  */
-struct EGMServerData
+struct UDPServerData
 {
   /**
    * \brief Default constructor.
    */
-  EGMServerData()
+  UDPServerData()
   :
   port_number(0),
   bytes_transferred(0)
@@ -68,39 +68,38 @@ struct EGMServerData
   char* p_data;
 
   /**
-   * \brief Bytes transferred to the server (from the robot controller).
+   * \brief Bytes transferred to the server.
    */
   int bytes_transferred;
 };
 
 /**
- * \brief Abstract class for an Externally Guided Motion (EGM) user interface.
+ * \brief Abstract class for a user interface to the UDPServer class.
  */
-class AbstractEGMInterface
+class AbstractUDPServerInterface
 {
 /**
  * \brief A friend to the interface.
  */
-friend class EGMServer;
+friend class UDPServer;
 
 private:
   /**
-   * \brief Pure virtual method for handling callback requests from an EGM server.
+   * \brief Pure virtual method for handling callback requests from a UDPServer instance.
    *
-   * \Param server_data containing the EGM server's callback data.
+   * \Param server_data containing the UDP server's callback data.
    *
    * \return string& containing the reply.
    */
-  virtual const std::string& callback(const EGMServerData& data) = 0;
+  virtual const std::string& callback(const UDPServerData& data) = 0;
 };
 
 /**
- * \brief Class for an Externally Guided Motion (EGM) asynchronous UDP server.
+ * \brief Class for an asynchronous UDP server.
  *
- * The server receives EGM messages from an ABB robot controller (that is running an EGM motion),
- * and then the server replies with EGM messages containing the new references for the robot.
+ * The server receives UDP messages from a client, passes the messages to a callback and returns a reply to the client.
  */
-class EGMServer
+class UDPServer
 {
 public:
   /**
@@ -108,16 +107,16 @@ public:
    *
    * \param io_service for operating boost asio's asynchronous functions.
    * \param port_number for the server's UDP socket.
-   * \param p_egm_interface that processes the received messages.
+   * \param p_interface that processes the received messages.
    */
-  EGMServer(boost::asio::io_service& io_service,
+  UDPServer(boost::asio::io_service& io_service,
             unsigned short port_number,
-            AbstractEGMInterface* p_egm_interface);
+            AbstractUDPServerInterface* p_interface);
 
   /**
    * \brief A destructor.
    */
-  ~EGMServer();
+  ~UDPServer();
 
   /**
    * \brief Checks if the server was successfully initialized or not.
@@ -167,14 +166,14 @@ private:
   char receive_buffer_[BUFFER_SIZE];
   
   /**
-   * \brief A pointer to an object that is derived from AbstractEGMInterface, which processes the received messages.
+   * \brief Pointer to an object that is derived from AbstractUDPSeverInterface, which processes the received messages.
    */
-  AbstractEGMInterface* p_egm_interface_;
+  AbstractUDPServerInterface* p_interface_;
 
   /**
    * \brief Container for server data.
    */
-  EGMServerData server_data_;
+  UDPServerData server_data_;
 
   /**
    * \brief Flag indicating if the server was initialized successfully or not.
@@ -185,4 +184,4 @@ private:
 } // end namespace egm
 } // end namespace abb
 
-#endif // EGM_SERVER_H
+#endif // EGM_UDP_SERVER_H

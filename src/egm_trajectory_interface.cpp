@@ -1149,7 +1149,7 @@ trajectory_motion_(configuration)
   }
 }
 
-const std::string& EGMTrajectoryInterface::callback(const EGMServerData& server_data)
+const std::string& EGMTrajectoryInterface::callback(const UDPServerData& server_data)
 {
   // Initialize the callback by:
   // - Parsing and extracting data from the recieved message.
@@ -1192,7 +1192,7 @@ const std::string& EGMTrajectoryInterface::callback(const EGMServerData& server_
  * Auxiliary methods
  */
 
-bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data)
+bool EGMTrajectoryInterface::initializeCallback(const UDPServerData& server_data)
 {
   bool success = false;
 
