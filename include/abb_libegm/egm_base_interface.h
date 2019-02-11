@@ -44,7 +44,7 @@
 
 #include "egm_common.h"
 #include "egm_logger.h"
-#include "egm_server.h"
+#include "egm_udp_server.h"
 
 namespace abb
 {
@@ -54,11 +54,11 @@ namespace egm
  * \brief Class for processing asynchronous callbacks.
  *
  * The class provides behavior for:
- * - Processing asynchronous callbacks from an EGM server. The interface recieves the robot controller's
+ * - Processing asynchronous callbacks from a UDP server. The interface recieves the robot controller's
  *   outbound messages and construct inbound messages to the robot controller.
  * - This class can for example be used as a foundation for custom made user interfaces.
  */
-class EGMBaseInterface : public AbstractEGMInterface
+class EGMBaseInterface : public AbstractUDPServerInterface
 {
 public:
   /**
@@ -117,7 +117,7 @@ public:
 
 protected:
   /**
-   * \brief Class for containing inputs from an EGM server.
+   * \brief Class for containing inputs from a UDP server.
    */
   class InputContainer
   {
@@ -252,7 +252,7 @@ protected:
   };
   
   /**
-   * \brief Class for containing outputs to an EGM server.
+   * \brief Class for containing outputs to a UDP server.
    */
   class OutputContainer
   {
@@ -443,26 +443,26 @@ protected:
   /**
    * \brief Initialize the callback.
    *
-   * \param server_data containing the EGM server's callback data.
+   * \param server_data containing the UDP server's callback data.
    *
    * \return bool indicating if the initialization succeeded or not.
    */
-  bool initializeCallback(const EGMServerData& server_data);
+  bool initializeCallback(const UDPServerData& server_data);
 
   /**
    * \brief Static constant wait time [ms] used when determining if a connection has been established or not.
    *
-   * I.e. a connection between the interface's EGM server, and a robot controller's EGM client.
+   * I.e. a connection between the interface's UDP server, and a robot controller's EGM client.
    */
   static const unsigned int WAIT_TIME_MS = 100;
 
   /**
-   * \brief Container for the inputs, to the interface, from the EGM server.
+   * \brief Container for the inputs, to the interface, from the UDP server.
    */
   InputContainer inputs_;
 
   /**
-   * \brief Container for the outputs, from the interface, to the EGM server.
+   * \brief Container for the outputs, from the interface, to the UDP server.
    */
   OutputContainer outputs_;
 
@@ -484,17 +484,17 @@ protected:
   /**
    * \brief Server for managing the communication with the robot controller.
    */
-  EGMServer egm_server_;
+  UDPServer udp_server_;
   
 private:
   /**
-   * \brief Handle callback requests from an EGM server.
+   * \brief Handle callback requests from an UDP server.
    *
-   * \param server_data containing the EGM server's callback data.
+   * \param server_data containing the UDP server's callback data.
    *
    * \return string& containing the reply.
    */
-  const std::string& callback(const EGMServerData& server_data);
+  const std::string& callback(const UDPServerData& server_data);
 };
 
 } // end namespace egm

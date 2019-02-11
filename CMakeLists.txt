@@ -53,7 +53,7 @@ set(SRC_FILES
     src/egm_controller_interface.cpp
     src/egm_interpolator.cpp
     src/egm_logger.cpp
-    src/egm_server.cpp
+    src/egm_udp_server.cpp
     src/egm_trajectory_interface.cpp
     ${EgmProtoSources})
 

@@ -53,7 +53,7 @@ namespace egm
  * \brief Class for an EGM trajectory user interface.
  *
  * The class provides behavior for following trajectories provided by an external user, and this includes:
- * - Processing asynchronous callbacks from an EGM server.
+ * - Processing asynchronous callbacks from an UDP server.
  * - Queuing ordered trajectories, and follow them in order.
  * - Providing methods for interacting with the trajectory execution (e.g. stop and resume execution).
  */
@@ -1112,20 +1112,20 @@ private:
   /**
    * \brief Initialize the callback.
    *
-   * \param server_data containing the EGM server's callback data.
+   * \param server_data containing the UDP server's callback data.
    *
    * \return bool indicating if the initialization succeeded or not.
    */
-  bool initializeCallback(const EGMServerData& server_data);
+  bool initializeCallback(const UDPServerData& server_data);
 
   /**
-   * \brief Handle callback requests from an EGM server.
+   * \brief Handle callback requests from an UDP server.
    *
-   * \param server_data containing the EGM server's callback data.
+   * \param server_data containing the UDP server's callback data.
    *
    * \return string& containing the reply.
    */
-  const std::string& callback(const EGMServerData& server_data);
+  const std::string& callback(const UDPServerData& server_data);
   
   /**
    * \brief The interface's configuration.

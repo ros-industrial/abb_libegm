@@ -155,7 +155,7 @@ EGMBaseInterface(io_service, port_number, configuration)
   }
 }
 
-const std::string& EGMControllerInterface::callback(const EGMServerData& server_data)
+const std::string& EGMControllerInterface::callback(const UDPServerData& server_data)
 {
   // Initialize the callback by:
   // - Parsing and extracting data from the recieved message.

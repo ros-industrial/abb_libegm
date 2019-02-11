@@ -655,7 +655,7 @@ EGMBaseInterface::EGMBaseInterface(boost::asio::io_service& io_service,
                                    const unsigned short port_number,
                                    const BaseConfiguration& configuration)
 :
-egm_server_(io_service, port_number, this),
+udp_server_(io_service, port_number, this),
 configuration_(configuration)
 {
   if (configuration_.active.use_logging)
@@ -666,7 +666,7 @@ configuration_(configuration)
   }
 }
 
-const std::string& EGMBaseInterface::callback(const EGMServerData& server_data)
+const std::string& EGMBaseInterface::callback(const UDPServerData& server_data)
 {
   // Initialize the callback by:
   // - Parsing and extracting data from the recieved message.
@@ -736,7 +736,7 @@ void EGMBaseInterface::logData(const InputContainer& inputs, const OutputContain
   }
 }
 
-bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
+bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
 {
   bool success = false;
 
@@ -796,7 +796,7 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
 
 bool EGMBaseInterface::isInitialized()
 {
-  return egm_server_.isInitialized();
+  return udp_server_.isInitialized();
 }
 
 bool EGMBaseInterface::isConnected()
