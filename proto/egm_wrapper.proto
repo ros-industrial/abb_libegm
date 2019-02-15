@@ -61,6 +61,13 @@ message Status
   optional RAPIDExecutionState rapid_execution_state = 4 [default = RAPID_UNDEFINED];
 }
 
+// Note: Time in seconds and microseconds since 1 Jan 1970
+message Clock
+{
+    optional uint64 seconds      = 1;
+    optional uint64 microseconds = 2;
+}
+
 //===========================================================
 //
 // Joint space related messages.
@@ -167,6 +174,7 @@ message Feedback
 {  
   optional Robot    robot    = 1;
   optional External external = 2;
+  optional Clock    time     = 3;
 }
 
 // Note: The velocity sub fields are estimated from the actual EGM messages.
@@ -174,6 +182,7 @@ message Planned
 {
   optional Robot    robot    = 1;
   optional External external = 2;
+  optional Clock    time     = 3;
 }
 
 //======================================================================================================================

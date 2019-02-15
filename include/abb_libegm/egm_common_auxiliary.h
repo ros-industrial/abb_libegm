@@ -322,6 +322,16 @@ bool parse(wrapper::Header* p_target, const EgmHeader& source);
 bool parse(wrapper::Status* p_target, const EgmRobot& source);
 
 /**
+ * \brief Parse an abb::egm::EgmClock object.
+ *
+ * \param p_target for containing the parsed data.
+ * \param source containing data to parse.
+ *
+ * \return bool indicating if the parsing was successful or not.
+ */
+bool parse(wrapper::Clock* p_target, const EgmClock& source);
+
+/**
  * \brief Parse two abb::egm::EgmJoints objects.
  *
  * \param p_target_robot for containing the parsed robot data.
