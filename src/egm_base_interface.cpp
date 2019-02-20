@@ -125,13 +125,22 @@ double EGMBaseInterface::InputContainer::estimateSampleTime()
 {
   double estimate = 0.0;
 
-  if (current_.has_header() && previous_.has_header())
+  if (current_.has_feedback() && previous_.has_feedback() &&
+      current_.feedback().has_time() && previous_.feedback().has_time() &&
+      current_.feedback().time().has_sec() && previous_.feedback().time().has_sec() &&
+      current_.feedback().time().has_usec() && previous_.feedback().time().has_usec())
   {
-    double temp = (double) (current_.header().time_stamp() - previous_.header().time_stamp());
-    estimate = temp*Constants::Conversion::MS_TO_S;
+    google::protobuf::uint64 diff_s = (current_.feedback().time().sec() - previous_.feedback().time().sec());
+    google::protobuf::uint64 diff_us = (current_.feedback().time().usec() - previous_.feedback().time().usec());
+    if (diff_s > 0)
+    {
+      diff_us += diff_s*((google::protobuf::uint64) Constants::Conversion::S_TO_US);
+    }
+
+    estimate = std::floor(((double) diff_us) * Constants::Conversion::MS_TO_S) * Constants::Conversion::MS_TO_S;
   }
-  
-  if (estimate <= 0.0)
+
+  if (estimate < Constants::RobotController::LOWEST_SAMPLE_TIME)
   {
     estimate = Constants::RobotController::LOWEST_SAMPLE_TIME;
   }

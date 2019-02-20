@@ -64,8 +64,8 @@ message Status
 // Note: Time in seconds and microseconds since 1 Jan 1970
 message Clock
 {
-    optional uint64 seconds      = 1;
-    optional uint64 microseconds = 2;
+    optional uint64 sec  = 1;
+    optional uint64 usec = 2;
 }
 
 //===========================================================

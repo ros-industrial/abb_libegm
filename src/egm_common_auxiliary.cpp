@@ -697,8 +697,8 @@ bool parse(wrapper::Clock* p_target, const EgmClock& source)
 
   if (p_target && source.has_sec() && source.has_usec())
   {
-    p_target->set_seconds(source.sec());
-    p_target->set_microseconds(source.usec());
+    p_target->set_sec(source.sec());
+    p_target->set_usec(source.usec());
   }
   else
   {
