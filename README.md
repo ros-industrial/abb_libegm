@@ -6,9 +6,7 @@
 
 ## Important Note
 
-RobotWare `6.07` introduced major changes in the EGM communication protocol, and this library has not been updated to support those changes yet.
-
-**Avoid using this library with RobotWare 6.07 (or newer) at the moment.**
+RobotWare versions less than `6.07.01` are now incompatible with *abb_libegm* (due to changes in the EGM communication protocol).
 
 ## Overview
 
@@ -25,7 +23,7 @@ The following is a conceptual sketch of how this EGM library can be viewed, in r
 
 ### Requirements
 
-* RobotWare versions between `6.0` and `6.06.01` (higher versions are to be considered incompatible at the moment).
+* RobotWare version `6.07.01` or higher.
 * A license for the RobotWare option *Externally Guided Motion* (`689-1`).
 
 ### Dependencies
@@ -42,15 +40,14 @@ This library is intended to be used with the UDP variant of EGM, and it supports
 
 ### Recommendations
 
-* This library has been verified to work with RobotWare `6.06.01`. Other versions are expected to work, but this cannot be guaranteed at the moment.
-  * **Avoid using this library with RobotWare 6.07 (or newer) at the moment.**<br/> Please see the `Important Note` section for more info.
+* This library has been verified to work with RobotWare version `6.08.00.01`. Other versions are expected to work, except versions older than RobotWare `6.07.01` which are incompatible due to changes in the EGM communication protocol.
 * It is a good idea to perform RobotStudio simulations before working with a real robot.
 * It is prudent to familiarize oneself with general safety regulations (e.g. described in ABB manuals).
 * Consider cyber security aspects, before connecting robot controllers to networks.
 
 ## Usage Hints
 
-This is a generic library, which can be used together with any RAPID program that is using the RAPID `EGMRunJoint` and/or `EGMRunPose` instructions, and system configurations. The library's primary classes are:
+This is a generic library, which can be used together with any RAPID program that is using the RAPID `EGMRunJoint` and/or `EGMRunPose` instructions, and system configuration. The library's primary classes are:
 
 * [EGMServer](include/abb_libegm/egm_server.h): Sets up and manages asynchronous UDP communication loops. During an EGM communication session, the robot controller requests new references, at the rate specified with RAPID `EGMAct` instructions. When an `EGMServer` instance receives an EGM message from the robot controller the message is passed on to an EGM interface instance (see below). The interface is expected to generate the reply message, containing the new references, which the server then sends back to the robot controller.
 * [AbstractEGMInterface](include/abb_libegm/egm_server.h): An abstract interface, which specifies how the `EGMServer` class interacts with EGM interfaces. Can be inherited from to implement custom EGM interfaces.
@@ -62,9 +59,9 @@ The optional *StateMachine Add-In* for RobotWare can be used in combination with
 
 ### StateMachine Add-In [Optional]
 
-The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controllers. It is made for both *real physical controllers* and *virtual controllers* simulated in RobotStudio. If the Add-In is selected during a RobotWare system installation, then the Add-In will load several RAPID modules and system configurations based on the system specifications (e.g. number of robots and present options).
+The purpose of the RobotWare Add-In is to *ease the setup* of ABB robot controllers. It is made for both *real controllers* and *virtual controllers* (simulated in RobotStudio). If the Add-In is selected during a RobotWare system installation, then the Add-In will load several RAPID modules and system configurations based on the system specifications (e.g. number of robots and present options).
 
-The RAPID modules and configurations constitutes a customizable, ready to run, RAPID program, which contains a state machine implementation. Each motion task in the robot system receives its own state machine instance, and the intention is to use this in combination with external systems that require interaction with the robot(s). The following is a conceptual sketch of the RAPID program's execution flow.
+The RAPID modules and configurations constitute a customizable, but ready to run, RAPID program which contains a state machine implementation. Each motion task in the robot system receives its own state machine instance, and the intention is to use this in combination with external systems that require interaction with the robot(s). The following is a conceptual sketch of the RAPID program's execution flow.
 
 <p align="center">
   <img src="docs/images/statemachine_addin_sketch.png" width="500">
@@ -78,7 +75,7 @@ To install the Add-In:
 4. Verify that the Add-In was added to the list *Installed Packages*.
 5. The Add-In should appear as an option during the installation of a RobotWare system.
 
-See the Add-In's [user manual](https://robotapps.blob.core.windows.net/appreferences/docs/2093c0e8-d469-4188-bdd2-ca42e27cba5cUserManual.pdf) for more details, as well as for install instructions for RobotWare systems.
+See the Add-In's [user manual](https://robotapps.blob.core.windows.net/appreferences/docs/2093c0e8-d469-4188-bdd2-ca42e27cba5cUserManual.pdf) for more details, as well as for install instructions for RobotWare systems. The manual can also be accessed by right-clicking on the Add-In in the *Installed Packages* list and selecting *Documentation*.
 
 #### Notes
 
