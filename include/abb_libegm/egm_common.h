@@ -119,6 +119,11 @@ struct Constants
      * \brief Conversion value from milliseconds to seconds.
      */
     static const double MS_TO_S;
+
+    /**
+     * \brief Conversion value from seconds to microseconds.
+     */
+    static const double S_TO_US;
   };
 };
 

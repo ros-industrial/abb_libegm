@@ -143,7 +143,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
     //       E.g. for stopping use K = 0.0.
     //
     //---------------------
-    // Conditons:
+    // Conditions:
     //---------------------
     // 0 < t <= T
     //
@@ -171,7 +171,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
         // S(t) = A + B*t
         //
         //---------------------
-        // Conditons:
+        // Conditions:
         //---------------------
         // 0 <= t <= T
         //
@@ -194,7 +194,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
         // S(t) = A + B*t + C*t^2
         //
         //---------------------
-        // Conditons:
+        // Conditions:
         //---------------------
         // 0 <= t <= T
         //
@@ -219,7 +219,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
         // S(t) = A + B*t + C*t^2 + D*t^3
         //
         //---------------------
-        // Conditons:
+        // Conditions:
         //---------------------
         // 0 <= t <= T
         //
@@ -249,7 +249,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
         // S(t) = A + B*t + C*t^2 + D*t^3 + E*t^4 + F*t^5
         //
         //---------------------
-        // Conditons:
+        // Conditions:
         //---------------------
         // 0 <= t <= T
         //
