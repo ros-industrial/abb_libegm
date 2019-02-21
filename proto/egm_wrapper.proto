@@ -61,7 +61,7 @@ message Status
   optional RAPIDExecutionState rapid_execution_state = 4 [default = RAPID_UNDEFINED];
 }
 
-// Note: Time in seconds and microseconds since 1 Jan 1970
+// Note: Time in seconds and microseconds since the epoch (1 Jan 1970)
 message Clock
 {
     optional uint64 sec  = 1;
