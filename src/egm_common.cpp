@@ -61,7 +61,7 @@ const double Constants::Conversion::RAD_TO_DEG = 180.0 / M_PI;
 const double Constants::Conversion::DEG_TO_RAD = M_PI / 180.0;
 const double Constants::Conversion::MM_TO_M = 0.001;
 const double Constants::Conversion::MS_TO_S = 0.001;
-const double Constants::Conversion::S_TO_US = 1000000.0;
+const double Constants::Conversion::S_TO_US = 1e6;
 
 } // end namespace egm
 } // end namespace abb
