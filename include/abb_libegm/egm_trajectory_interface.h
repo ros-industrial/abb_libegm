@@ -90,8 +90,10 @@ public:
    *
    * \param trajectory containing the trajectory to add.
    * \param override_trajectories indicating if all pending trajectories should be overridden (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void addTrajectory(const wrapper::trajectory::TrajectoryGoal trajectory, const bool override_trajectories = false);
+  bool addTrajectory(const wrapper::trajectory::TrajectoryGoal trajectory, const bool override_trajectories = false);
 
   /**
    * \brief Stop the trajectory motion execution.
@@ -100,55 +102,69 @@ public:
    *       EGM communication session completely. A resume normally needs to be ordered for execution to start again.
    *
    * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void stop(const bool discard_trajectories = false);
+  bool stopTrajectory(const bool discard_trajectories = false);
 
   /**
    * \brief Resume the trajectory motion execution (after a stop has occurred).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void resume();
+  bool resumeTrajectory();
 
   /**
    * \brief Update the duration scaling factor for trajectory goals.
-   * 
+   *
    * Note: Only values between 1.0 and 5.0 will be considered. E.g. if the factor is 2.0,
    *       then the remaining duration will be doubled. As will all upcoming goal durations.
    *
    * \param factor containing the new scale factor.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void updateDurationFactor(double factor);
-  
+  bool updateDurationFactor(double factor);
+
   /**
    * \brief Start to follow a static goal.
-   * 
+   *
    * Note: Any current trajectory motions will be stopped before starting to follow the static goal.
    *
    * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void startStaticGoal(const bool discard_trajectories = false);
-  
+  bool startStaticGoal(const bool discard_trajectories = false);
+
   /**
    * \brief Set a static position goal to follow.
    *
    * \param position_goal containing the static position goal to follow.
    * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition = false);
-  
+  bool setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition = false);
+
   /**
    * \brief Set a static velocity goal to follow.
    *
    * \param velocity_goal containing the static velocity goal to follow.
    * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition = false);
+  bool setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition = false);
 
   /**
    * \brief Finish following a static goal.
    *
    * \param resume indicating if normal trajectory motion execution should be resumed automatically.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void finishStaticGoal(const bool resume = false);
+  bool finishStaticGoal(const bool resume = false);
   
   /**
    * \brief Retrieve an execution progress from the trajectory interface.
@@ -341,8 +357,10 @@ private:
      *
      * \param trajectory containing the trajectory to add.
      * \param override_trajectories indicating if all pending trajectories should be overridden (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void addTrajectory(const wrapper::trajectory::TrajectoryGoal& trajectory, const bool override_trajectories);
+    bool addTrajectory(const wrapper::trajectory::TrajectoryGoal& trajectory, const bool override_trajectories);
 
     /**
      * \brief Stop the trajectory motion execution.
@@ -350,55 +368,69 @@ private:
      * Note: A resume normally needs to be ordered for execution to start again.
      *
      * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void stop(const bool discard_trajectories);
+    bool stopTrajectory(const bool discard_trajectories);
 
     /**
      * \brief Resume the trajectory motion execution (after a stop has occurred).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void resume();
-    
+    bool resumeTrajectory();
+
     /**
      * \brief Update the duration scaling factor for trajectory goals.
-     * 
+     *
      * Note: Only values between 1.0 and 5.0 will be considered. E.g. if the factor is 2.0,
      *       then the remaining duration will be doubled. As will all upcoming goal durations.
      *
      * \param factor containing the new scale factor.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void updateDurationFactor(double factor);
-  
+    bool updateDurationFactor(double factor);
+
     /**
      * \brief Start to follow a static goal.
-     * 
+     *
      * Note: Any current trajectory motions will be stopped before starting to follow the static goal.
      *
      * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void startStaticGoal(const bool discard_trajectories);
+    bool startStaticGoal(const bool discard_trajectories);
 
     /**
      * \brief Set a static position goal to follow.
      *
      * \param position_goal containing the static position goal to follow.
      * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
-  
+    bool setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
+
     /**
      * \brief Set a static velocity goal to follow.
      *
      * \param velocity_goal containing the static velocity goal to follow.
      * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
+    bool setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
 
     /**
      * \brief Finish following a static goal.
      *
      * \param resume indicating if normal trajectory motion execution should be resumed automatically.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void finishStaticGoal(const bool resume);
+    bool finishStaticGoal(const bool resume);
     
     /**
      * \brief Retrieve an execution progress from the trajectory interface.

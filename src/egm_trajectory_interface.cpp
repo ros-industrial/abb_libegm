@@ -1114,7 +1114,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::storeNormalGoal()
  * User interaction methods
  */
 
-void EGMTrajectoryInterface::TrajectoryMotion::addTrajectory(const trajectory::TrajectoryGoal& trajectory,
+bool EGMTrajectoryInterface::TrajectoryMotion::addTrajectory(const trajectory::TrajectoryGoal& trajectory,
                                                              const bool override_trajectories)
 {
   boost::shared_ptr<EGMTrajectoryInterface::Trajectory> p_traj(new EGMTrajectoryInterface::Trajectory(trajectory));
@@ -1122,96 +1122,152 @@ void EGMTrajectoryInterface::TrajectoryMotion::addTrajectory(const trajectory::T
   boost::lock_guard<boost::mutex> data_lock(data_.mutex);
   boost::lock_guard<boost::mutex> trajectory_lock(trajectories_.mutex);
 
-  if (override_trajectories)
+  bool accepted = state_manager_.verifyState(Normal, Running);
+
+  if (accepted)
   {
-    trajectories_.temporary_queue.clear();
-    trajectories_.temporary_queue.push_back(p_traj);
-    data_.pending_events.do_ramp_down = true;
-    data_.pending_events.do_stop = true;
-    data_.pending_events.do_discard = true;
-    data_.pending_events.do_resume = true;
-  }
-  else
-  {
-    if (data_.pending_events.do_discard)
+    if (override_trajectories)
     {
+      trajectories_.temporary_queue.clear();
       trajectories_.temporary_queue.push_back(p_traj);
+      data_.pending_events.do_ramp_down = true;
+      data_.pending_events.do_stop = true;
+      data_.pending_events.do_discard = true;
+      data_.pending_events.do_resume = true;
     }
     else
     {
-      trajectories_.primary_queue.push_back(p_traj);
+      if (data_.pending_events.do_discard)
+      {
+        trajectories_.temporary_queue.push_back(p_traj);
+      }
+      else
+      {
+        trajectories_.primary_queue.push_back(p_traj);
+      }
     }
   }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::stop(const bool discard_trajectories)
+bool EGMTrajectoryInterface::TrajectoryMotion::stopTrajectory(const bool discard_trajectories)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = true;
-  data_.pending_events.do_stop = true;
-  data_.pending_events.do_discard = discard_trajectories;
+  bool accepted = state_manager_.verifyState(Normal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_ramp_down = true;
+    data_.pending_events.do_stop = true;
+    data_.pending_events.do_discard = discard_trajectories;
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::resume()
+bool EGMTrajectoryInterface::TrajectoryMotion::resumeTrajectory()
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_resume = true;
+  bool accepted = state_manager_.verifyState(RampDown, Finished);
+
+  if (accepted)
+  {
+    data_.pending_events.do_resume = true;
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::updateDurationFactor(double factor)
+bool EGMTrajectoryInterface::TrajectoryMotion::updateDurationFactor(double factor)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = true;
-  data_.pending_events.do_duration_factor_update = true;
-  data_.pending_events.duration_factor = saturate(factor, DURATION_FACTOR_MIN, DURATION_FACTOR_MAX);
+  bool accepted = state_manager_.verifyState(Normal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_ramp_down = true;
+    data_.pending_events.do_duration_factor_update = true;
+    data_.pending_events.duration_factor = saturate(factor, DURATION_FACTOR_MIN, DURATION_FACTOR_MAX);
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::startStaticGoal(const bool discard_trajectories)
+bool EGMTrajectoryInterface::TrajectoryMotion::startStaticGoal(const bool discard_trajectories)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = true;
-  data_.pending_events.do_stop = true;
-  data_.pending_events.do_discard = discard_trajectories;
-  data_.pending_events.do_resume = true;
-  data_.pending_events.do_static_goal_start = true;
+  bool accepted = state_manager_.verifyState(Normal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_ramp_down = true;
+    data_.pending_events.do_stop = true;
+    data_.pending_events.do_discard = discard_trajectories;
+    data_.pending_events.do_resume = true;
+    data_.pending_events.do_static_goal_start = true;
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
+bool EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = !fast_transition;
-  data_.pending_events.do_stop = !fast_transition;
-  data_.pending_events.do_resume = true;
-  data_.pending_events.do_static_goal_fast_update = fast_transition;
-  data_.pending_events.do_static_position_goal_update = true;
-  data_.pending_events.do_static_velocity_goal_update = false;
-  data_.pending_events.static_position_goal.CopyFrom(position_goal);
+  bool accepted = state_manager_.verifyState(StaticGoal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_ramp_down = !fast_transition;
+    data_.pending_events.do_stop = !fast_transition;
+    data_.pending_events.do_resume = true;
+    data_.pending_events.do_static_goal_fast_update = fast_transition;
+    data_.pending_events.do_static_position_goal_update = true;
+    data_.pending_events.do_static_velocity_goal_update = false;
+    data_.pending_events.static_position_goal.CopyFrom(position_goal);
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
+bool EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_ramp_down = !fast_transition;
-  data_.pending_events.do_stop = !fast_transition;
-  data_.pending_events.do_resume = true;
-  data_.pending_events.do_static_goal_fast_update = fast_transition;
-  data_.pending_events.do_static_velocity_goal_update = true;
-  data_.pending_events.do_static_position_goal_update = false;
-  data_.pending_events.static_velocity_goal.CopyFrom(velocity_goal);
+  bool accepted = state_manager_.verifyState(StaticGoal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_ramp_down = !fast_transition;
+    data_.pending_events.do_stop = !fast_transition;
+    data_.pending_events.do_resume = true;
+    data_.pending_events.do_static_goal_fast_update = fast_transition;
+    data_.pending_events.do_static_velocity_goal_update = true;
+    data_.pending_events.do_static_position_goal_update = false;
+    data_.pending_events.static_velocity_goal.CopyFrom(velocity_goal);
+  }
+
+  return accepted;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::finishStaticGoal(const bool resume)
+bool EGMTrajectoryInterface::TrajectoryMotion::finishStaticGoal(const bool resume)
 {
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
-  data_.pending_events.do_static_goal_finish = true;
-  data_.pending_events.do_resume = resume;
+  bool accepted = state_manager_.verifyState(StaticGoal, Running);
+
+  if (accepted)
+  {
+    data_.pending_events.do_static_goal_finish = true;
+    data_.pending_events.do_resume = resume;
+  }
+
+  return accepted;
 }
 
 bool EGMTrajectoryInterface::TrajectoryMotion::retrieveExecutionProgress(trajectory::ExecutionProgress* p_progress)
@@ -1372,45 +1428,45 @@ void EGMTrajectoryInterface::setConfiguration(const TrajectoryConfiguration& con
   configuration_.has_pending_update = true;
 }
 
-void EGMTrajectoryInterface::addTrajectory(const trajectory::TrajectoryGoal trajectory,
+bool EGMTrajectoryInterface::addTrajectory(const trajectory::TrajectoryGoal trajectory,
                                            const bool override_trajectories)
 {
-  trajectory_motion_.addTrajectory(trajectory, override_trajectories);
+  return trajectory_motion_.addTrajectory(trajectory, override_trajectories);
 }
 
-void EGMTrajectoryInterface::stop(const bool discard_trajectories)
+bool EGMTrajectoryInterface::stopTrajectory(const bool discard_trajectories)
 {
-  trajectory_motion_.stop(discard_trajectories);
+  return trajectory_motion_.stopTrajectory(discard_trajectories);
 }
 
-void EGMTrajectoryInterface::resume()
+bool EGMTrajectoryInterface::resumeTrajectory()
 {
-  trajectory_motion_.resume();
+  return trajectory_motion_.resumeTrajectory();
 }
 
-void EGMTrajectoryInterface::updateDurationFactor(double factor)
+bool EGMTrajectoryInterface::updateDurationFactor(double factor)
 {
-  trajectory_motion_.updateDurationFactor(factor);
+  return trajectory_motion_.updateDurationFactor(factor);
 }
 
-void EGMTrajectoryInterface::startStaticGoal(const bool discard_trajectories)
+bool EGMTrajectoryInterface::startStaticGoal(const bool discard_trajectories)
 {
-  trajectory_motion_.startStaticGoal(discard_trajectories);
+  return trajectory_motion_.startStaticGoal(discard_trajectories);
 }
 
-void EGMTrajectoryInterface::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
+bool EGMTrajectoryInterface::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
 {
-  trajectory_motion_.setStaticGoal(position_goal, fast_transition);
+  return trajectory_motion_.setStaticGoal(position_goal, fast_transition);
 }
 
-void EGMTrajectoryInterface::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
+bool EGMTrajectoryInterface::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
 {
-  trajectory_motion_.setStaticGoal(velocity_goal, fast_transition);
+  return trajectory_motion_.setStaticGoal(velocity_goal, fast_transition);
 }
 
-void EGMTrajectoryInterface::finishStaticGoal(const bool resume)
+bool EGMTrajectoryInterface::finishStaticGoal(const bool resume)
 {
-  trajectory_motion_.finishStaticGoal(resume);
+  return trajectory_motion_.finishStaticGoal(resume);
 }
 
 bool EGMTrajectoryInterface::retrieveExecutionProgress(trajectory::ExecutionProgress* p_execution_progress)
