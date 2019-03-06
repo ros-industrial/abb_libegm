@@ -58,6 +58,26 @@ using namespace wrapper::trajectory;
 /************************************************************
  * Primary methods
  */
+
+void EGMTrajectoryInterface::TrajectoryMotion::StateManager::activateStateManager(bool egm_states_ok)
+{
+  if (current_state_ == Normal && current_sub_state_ == None)
+  {
+    if (egm_states_ok)
+    {
+      current_state_ = Normal;
+      current_sub_state_ = Running;
+    }
+  }
+  else
+  {
+    if (!egm_states_ok)
+    {
+      resetStateManager();
+    }
+  }
+}
+
 void EGMTrajectoryInterface::TrajectoryMotion::StateManager::setPendingState(const States& desired_state,
                                                                              const SubStates& desired_sub_state)
 {
@@ -113,7 +133,8 @@ void EGMTrajectoryInterface::TrajectoryMotion::StateManager::setPendingState(con
         break;
 
         case Running:
-          accepted = (desired_state == StaticGoal && desired_sub_state == Finished);
+          accepted = (desired_state == StaticGoal && desired_sub_state == Finished) ||
+                     (desired_state == RampDown && desired_sub_state == None);
         break;
 
         case Finished:
@@ -135,6 +156,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::StateManager::setPendingState(con
 /************************************************************
  * Auxiliary methods
  */
+
 wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryMotion::StateManager::mapState()
 {
   switch (current_state_)
@@ -166,6 +188,7 @@ wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryM
 /************************************************************
  * Primary methods
  */
+
 void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::resetMotionStep()
 {
   unsigned int robot_joints = data.feedback.robot().joints().position().values_size();
@@ -348,6 +371,7 @@ bool EGMTrajectoryInterface::TrajectoryMotion::MotionStep::conditionMet()
 /************************************************************
  * Auxiliary methods
  */
+
 double EGMTrajectoryInterface::TrajectoryMotion::MotionStep::estimateDuration()
 {
   // Note: The duration estimation should only be used if no duration has been specified externally, and it includes:
@@ -991,7 +1015,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
     case Running:
     {
       // Update the internal goal, with the new static goal.
-      if (data_.pending_events.do_static_position_goal_update)
+      if (data_.pending_events.do_static_position_goal_update && !data_.pending_events.do_ramp_down)
       {
         motion_step_.prepareStaticGoal(data_.pending_events.static_position_goal,
                                        data_.pending_events.do_static_goal_fast_update);
@@ -1000,7 +1024,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
         data_.has_new_goal = true;
         data_.has_active_goal = true;
       }
-      else if (data_.pending_events.do_static_velocity_goal_update)
+      else if (data_.pending_events.do_static_velocity_goal_update && !data_.pending_events.do_ramp_down)
       {
         motion_step_.prepareStaticGoal(data_.pending_events.static_velocity_goal,
                                        data_.pending_events.do_static_goal_fast_update);
@@ -1013,6 +1037,10 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
       if (data_.pending_events.do_static_goal_finish)
       {
         state_manager_.setPendingState(StaticGoal, Finished);
+      }
+      else if (data_.pending_events.do_ramp_down)
+      {
+        state_manager_.setPendingState(RampDown, None);
       }
     }
     break;
