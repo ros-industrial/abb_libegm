@@ -52,6 +52,114 @@ using namespace wrapper;
 using namespace wrapper::trajectory;
 
 /***********************************************************************************************************************
+ * Class definitions: EGMTrajectoryInterface::TrajectoryMotion::StateManager
+ */
+
+/************************************************************
+ * Primary methods
+ */
+void EGMTrajectoryInterface::TrajectoryMotion::StateManager::setPendingState(const States& desired_state,
+                                                                             const SubStates& desired_sub_state)
+{
+  bool accepted = false;
+
+  switch (current_state_)
+  {
+    case Normal:
+    {
+      switch (current_sub_state_)
+      {
+        case None:
+          // Should never occur.
+        break;
+
+        case Running:
+          accepted = (desired_state == RampDown && desired_sub_state == None);
+        break;
+
+        case Finished:
+          // Should never occur.
+        break;
+      }
+    }
+    break;
+
+    case RampDown:
+    {
+      switch (current_sub_state_)
+      {
+        case None:
+          accepted = (desired_state == RampDown && desired_sub_state == Running);
+        break;
+
+        case Running:
+          accepted = (desired_state == RampDown && desired_sub_state == Finished);
+        break;
+
+        case Finished:
+          accepted = (desired_state == Normal && desired_sub_state == Running) ||
+                     (desired_state == StaticGoal && desired_sub_state == None);
+        break;
+      }
+    }
+    break;
+
+    case StaticGoal:
+    {
+      switch (current_sub_state_)
+      {
+        case None:
+          accepted = (desired_state == StaticGoal && desired_sub_state == Running);
+        break;
+
+        case Running:
+          accepted = (desired_state == StaticGoal && desired_sub_state == Finished);
+        break;
+
+        case Finished:
+          accepted = (desired_state == RampDown && desired_sub_state == None);
+        break;
+      }
+    }
+    break;
+  }
+
+  if (accepted)
+  {
+    pending_state_ = desired_state;
+    pending_sub_state_ = desired_sub_state;
+    has_pending_state_ = true;
+  }
+}
+
+/************************************************************
+ * Auxiliary methods
+ */
+wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryMotion::StateManager::mapState()
+{
+  switch (current_state_)
+  {
+    case Normal:
+      return wrapper::trajectory::ExecutionProgress_State_NORMAL;
+    break;
+
+    case RampDown:
+      return wrapper::trajectory::ExecutionProgress_State_RAMP_DOWN;
+    break;
+
+    case StaticGoal:
+      return wrapper::trajectory::ExecutionProgress_State_STATIC_GOAL;
+    break;
+
+    default:
+      return wrapper::trajectory::ExecutionProgress_State_UNDEFINED;
+  }
+}
+
+
+
+
+/***********************************************************************************************************************
  * Class definitions: EGMTrajectoryInterface::TrajectoryMotion::MotionStep
  */
 
@@ -630,41 +738,45 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
   // Prepare for trajectory motion.
   prepare(inputs);
 
-  // Prepare auxiliary data.
-  prepareDecisionData();
-
-  // Process the current state.
-  switch (data_.state)
+  // Only generate outputs, if the EGM session states are ok.
+  if(inputs.states_ok())
   {
-    case Normal:     processNormalState();     break;
-    case RampDown:   processRampDownState();   break;
-    case StaticGoal: processStaticGoalState(); break;
-  }
+    // Update the current state.
+    state_manager_.updateState();
 
-  // Prepare for any new goal.
-  if (data_.has_new_goal)
-  {
-    // Update the interpolator.
-    motion_step_.updateInterpolator();
+    // Process the current state.
+    switch (state_manager_.getState())
+    {
+      case Normal:     processNormalState();     break;
+      case RampDown:   processRampDownState();   break;
+      case StaticGoal: processStaticGoalState(); break;
+    }
 
-    // Update the controller.
-    controller_.update(data_.state, motion_step_, configurations_);
-  }
+    // Prepare for any new goal.
+    if (data_.has_new_goal)
+    {
+      // Update the interpolator.
+      motion_step_.updateInterpolator();
 
-  // Generate the outputs.
-  if (p_outputs && data_.has_active_goal)
-  {
-    // Evaluate the interpolator.
-    motion_step_.evaluateInterpolator();
+      // Update the controller.
+      controller_.update(state_manager_.getState(), motion_step_, configurations_);
+    }
 
-    // Calculate the outputs to the robot controller.
-    controller_.calculate(p_outputs, &motion_step_);
+    // Generate the outputs.
+    if (p_outputs && data_.has_active_goal)
+    {
+      // Evaluate the interpolator.
+      motion_step_.evaluateInterpolator();
+
+      // Calculate the outputs to the robot controller.
+      controller_.calculate(p_outputs, &motion_step_);
+    }
   }
 
   // Update the execution progress.
   if(p_outputs)
   {
-    data_.execution_progress.set_state(mapCurrentState());
+    data_.execution_progress.set_state(state_manager_.mapState());
     data_.execution_progress.mutable_inputs()->CopyFrom(inputs.current());
     data_.execution_progress.mutable_outputs()->CopyFrom(*p_outputs);
     data_.execution_progress.set_goal_active(data_.has_active_goal);
@@ -698,11 +810,19 @@ void EGMTrajectoryInterface::TrajectoryMotion::prepare(const InputContainer& inp
   motion_step_.data.estimated_sample_time = inputs.estimated_sample_time();
   motion_step_.data.feedback.CopyFrom(inputs.current().feedback());
 
+  // Reset internal components, if a new EGM session has started.
   if (inputs.first_message())
   {
     resetTrajectoryMotion();
     motion_step_.resetMotionStep();
+    state_manager_.resetStateManager();
   }
+
+  // Activate the state manager, if the EGM session states are ok.
+  state_manager_.activateStateManager(inputs.states_ok());
+
+  // Assume no new goal.
+  data_.has_new_goal = false;
 }
 
 void EGMTrajectoryInterface::TrajectoryMotion::resetTrajectoryMotion()
@@ -716,89 +836,65 @@ void EGMTrajectoryInterface::TrajectoryMotion::resetTrajectoryMotion()
 
   data_.has_active_goal = false;
   data_.has_new_goal = false;
-  data_.state = Normal;
-  data_.sub_state = None;
   data_.execution_progress.Clear();
   data_.has_updated_execution_progress = false;
 }
 
-void EGMTrajectoryInterface::TrajectoryMotion::prepareDecisionData()
-{
-  // Prepare the current state and sub state.
-  if (data_.state != RampDown)
-  {
-    if (data_.pending_events.do_ramp_down)
-    {
-      data_.state = RampDown;
-      data_.sub_state = None;
-    }
-    else if (data_.pending_events.do_static_goal_start)
-    {
-      if (data_.state != StaticGoal)
-      {
-        data_.sub_state = None;
-      }
-      data_.state = StaticGoal;
-    }
-    else
-    {
-      data_.state = Normal;
-      data_.sub_state = None;
-    }
-  }
-
-  // Reset the resume flag (i.e. ignore resume order if no stop order has occurred).
-  if (!data_.pending_events.do_static_goal_finish)
-  {
-    if (!data_.pending_events.do_stop)
-    {
-      data_.pending_events.do_resume = false;
-    }
-  }
-
-  // Reset the static goal finish flag (i.e. ignore finish order if no static goal order has been started).
-  if (!data_.pending_events.do_static_goal_start)
-  {
-    data_.pending_events.do_static_goal_finish = false;
-  }
-
-  // Assume no new goal.
-  data_.has_new_goal = false;
-}
-
 void EGMTrajectoryInterface::TrajectoryMotion::processNormalState()
 {
-  if (trajectories_.p_current)
+  switch (state_manager_.getSubState())
   {
-    if (motion_step_.interpolationDurationReached())
+    case None:
+      // Should never occur.
+    break;
+
+    case Running:
     {
-      if (motion_step_.internal_goal.reach())
+      if (data_.pending_events.do_ramp_down)
       {
-        if(motion_step_.conditionMet())
-        {
-          updateNormalGoal();
-        }
+        state_manager_.setPendingState(RampDown, None);
       }
       else
       {
-        updateNormalGoal();
+        if (trajectories_.p_current)
+        {
+          if (motion_step_.interpolationDurationReached())
+          {
+            if (motion_step_.internal_goal.reach())
+            {
+              if (motion_step_.conditionMet())
+              {
+                updateNormalGoal();
+              }
+            }
+            else
+            {
+              updateNormalGoal();
+            }
+          }
+        }
+        else
+        {
+          if (!trajectories_.primary_queue.empty())
+          {
+            trajectories_.p_current = trajectories_.primary_queue.front();
+            trajectories_.primary_queue.pop_front();
+            updateNormalGoal();
+          }
+        }
       }
     }
-  }
-  else
-  {
-    if (!trajectories_.primary_queue.empty())
-    {
-      trajectories_.p_current = trajectories_.primary_queue.front();
-      trajectories_.primary_queue.pop_front();
-      updateNormalGoal();
-    }
+    break;
+
+    case Finished:
+      // Should never occur.
+    break;
   }
 }
 
 void EGMTrajectoryInterface::TrajectoryMotion::processRampDownState()
 {
-  switch (data_.sub_state)
+  switch (state_manager_.getSubState())
   {
     case None:
     {
@@ -812,7 +908,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processRampDownState()
 
       data_.has_new_goal = true;
       data_.has_active_goal = true;
-      data_.sub_state = Running;
+      state_manager_.setPendingState(RampDown, Running);
     }
     break;
 
@@ -820,7 +916,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processRampDownState()
     {
       if (motion_step_.interpolationDurationReached())
       {
-        data_.sub_state = Finished;
+        state_manager_.setPendingState(RampDown, Finished);
       }
     }
     break;
@@ -851,19 +947,23 @@ void EGMTrajectoryInterface::TrajectoryMotion::processRampDownState()
           data_.pending_events.do_ramp_down = false;
           data_.pending_events.do_stop = false;
           data_.pending_events.do_resume = false;
-          data_.state = Normal;
           
-          if (!data_.pending_events.do_static_goal_start)
+          if (data_.pending_events.do_static_goal_start)
+          {
+            state_manager_.setPendingState(StaticGoal, None);
+          }
+          else
           {
             updateNormalGoal();
+            state_manager_.setPendingState(Normal, Running);
           }
         }
       }
       else
       {
         data_.pending_events.do_ramp_down = false;
-        data_.state = Normal;
         updateNormalGoal();
+        state_manager_.setPendingState(Normal, Running);
       }
     }
     break;
@@ -872,7 +972,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processRampDownState()
 
 void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
 {
-  switch (data_.sub_state)
+  switch (state_manager_.getSubState())
   {
     case None:
     {
@@ -884,7 +984,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
       }
 
       data_.has_active_goal = false;
-      data_.sub_state = Running;
+      state_manager_.setPendingState(StaticGoal, Running);
     }
     break;
 
@@ -912,7 +1012,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
 
       if (data_.pending_events.do_static_goal_finish)
       {
-        data_.sub_state = Finished;
+        state_manager_.setPendingState(StaticGoal, Finished);
       }
     }
     break;
@@ -928,6 +1028,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::processStaticGoalState()
       // Perform a ramp down stop.
       data_.pending_events.do_ramp_down = true;
       data_.pending_events.do_stop = true;
+      state_manager_.setPendingState(RampDown, None);
     }
     break;
   }
@@ -978,27 +1079,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::storeNormalGoal()
                                             motion_step_.internal_goal.duration() - motion_step_.data.time_passed));
 
     trajectories_.p_current->addTrajectoryPointFront(motion_step_.external_goal);
-  }
-}
-
-wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryMotion::mapCurrentState()
-{
-  switch (data_.state)
-  {
-    case Normal:
-      return wrapper::trajectory::ExecutionProgress_State_NORMAL;
-    break;
-
-    case RampDown:
-      return wrapper::trajectory::ExecutionProgress_State_RAMP_DOWN;
-    break;
-
-    case StaticGoal:
-      return wrapper::trajectory::ExecutionProgress_State_STATIC_GOAL;
-    break;
-
-    default:
-      return wrapper::trajectory::ExecutionProgress_State_UNDEFINED;
   }
 }
 
@@ -1164,10 +1244,7 @@ const std::string& EGMTrajectoryInterface::callback(const UDPServerData& server_
     }
     else
     {
-      if (inputs_.first_message() || inputs_.states_ok())
-      {
-        trajectory_motion_.generateOutputs(&outputs_.current, inputs_);
-      }
+      trajectory_motion_.generateOutputs(&outputs_.current, inputs_);
     }
 
     // Log inputs and outputs.
