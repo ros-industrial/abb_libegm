@@ -725,6 +725,18 @@ private:
        */
       wrapper::trajectory::ExecutionProgress_State mapState();
 
+      /**
+       * \brief Maps the interface's current internal sub state to an execution progress sub state.
+       *
+       * The interface can be in any of the following sub states (depending on the current state):
+       * - None sub state (the current state is not active yet).
+       * - Running sub state (the current state is running).
+       * - Finished sub state (the current state has finished).
+       *
+       * \return ExecutionProgress_SubState with the execution progress sub state.
+       */
+      wrapper::trajectory::ExecutionProgress_SubState mapSubState();
+
     private:
       /**
        * \brief Flag indicating if there are any pending state change.

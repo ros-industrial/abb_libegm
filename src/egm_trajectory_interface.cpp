@@ -178,6 +178,27 @@ wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryM
   }
 }
 
+wrapper::trajectory::ExecutionProgress_SubState EGMTrajectoryInterface::TrajectoryMotion::StateManager::mapSubState()
+{
+  switch (current_sub_state_)
+  {
+    case None:
+      return wrapper::trajectory::ExecutionProgress_SubState_NONE;
+    break;
+
+    case Running:
+      return wrapper::trajectory::ExecutionProgress_SubState_RUNNING;
+    break;
+
+    case Finished:
+      return wrapper::trajectory::ExecutionProgress_SubState_FINISHED;
+    break;
+
+    default:
+      return wrapper::trajectory::ExecutionProgress_SubState_NONE;
+  }
+}
+
 
 
 
@@ -801,6 +822,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
   if(p_outputs)
   {
     data_.execution_progress.set_state(state_manager_.mapState());
+    data_.execution_progress.set_sub_state(state_manager_.mapSubState());
     data_.execution_progress.mutable_inputs()->CopyFrom(inputs.current());
     data_.execution_progress.mutable_outputs()->CopyFrom(*p_outputs);
     data_.execution_progress.set_goal_active(data_.has_active_goal);
