@@ -644,11 +644,13 @@ private:
       {}
 
       /**
-       * \brief Activate or deactivate the state manager.
-       *
-       * \param egm_states_ok indicating if the EGM session states are ok or not.
+       * \brief Activate the state manager.
        */
-      void activateStateManager(bool egm_states_ok);
+      void activateStateManager()
+      {
+        current_state_ = Normal;
+        current_sub_state_ = Running;
+      }
 
       /**
        * \brief Reset the state manager.

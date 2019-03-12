@@ -59,25 +59,6 @@ using namespace wrapper::trajectory;
  * Primary methods
  */
 
-void EGMTrajectoryInterface::TrajectoryMotion::StateManager::activateStateManager(bool egm_states_ok)
-{
-  if (current_state_ == Normal && current_sub_state_ == None)
-  {
-    if (egm_states_ok)
-    {
-      current_state_ = Normal;
-      current_sub_state_ = Running;
-    }
-  }
-  else
-  {
-    if (!egm_states_ok)
-    {
-      resetStateManager();
-    }
-  }
-}
-
 void EGMTrajectoryInterface::TrajectoryMotion::StateManager::setPendingState(const States& desired_state,
                                                                              const SubStates& desired_sub_state)
 {
@@ -265,6 +246,16 @@ void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareNormalGoal(con
   unsigned int external_joints = data.feedback.robot().joints().position().values_size();
 
   data.mode = (external_goal.robot().has_cartesian() ? EGMPose : EGMJoint);
+
+  // Reset the internal goal's velocity and acceleration values.
+  // Note: The Euler field is internally used to contain angular velocities.
+  reset(internal_goal.mutable_robot()->mutable_joints()->mutable_velocity(), robot_joints);
+  reset(internal_goal.mutable_robot()->mutable_joints()->mutable_acceleration(), robot_joints);
+  reset(internal_goal.mutable_robot()->mutable_cartesian()->mutable_velocity());
+  reset(internal_goal.mutable_robot()->mutable_cartesian()->mutable_acceleration());
+  reset(internal_goal.mutable_robot()->mutable_cartesian()->mutable_pose()->mutable_euler());
+  reset(internal_goal.mutable_external()->mutable_joints()->mutable_velocity(), external_joints);
+  reset(internal_goal.mutable_external()->mutable_joints()->mutable_acceleration(), external_joints);
 
   // Set up the internal goal's reach condition.
   internal_goal.set_reach(external_goal.has_reach() ? external_goal.reach() : false);
@@ -864,8 +855,27 @@ void EGMTrajectoryInterface::TrajectoryMotion::prepare(const InputContainer& inp
     state_manager_.resetStateManager();
   }
 
-  // Activate the state manager, if the EGM session states are ok.
-  state_manager_.activateStateManager(inputs.states_ok());
+  // Activate the state manager if a new EGM session's states are ok. Otherwise,
+  // reset the internal components if an active EGM session's states has become not ok.
+  if (inputs.states_ok())
+  {
+    if (state_manager_.verifyState(Normal, None))
+    {
+      state_manager_.activateStateManager();
+    }
+  }
+  else
+  {
+    if (!state_manager_.verifyState(Normal, None))
+    {
+      resetTrajectoryMotion();
+      motion_step_.resetMotionStep();
+      state_manager_.resetStateManager();
+
+      trajectories_.primary_queue.clear();
+      trajectories_.temporary_queue.clear();
+    }
+  }
 
   // Assume no new goal.
   data_.has_new_goal = false;
