@@ -25,7 +25,7 @@ message Header
     DATA      = 1; // Message contains data sent by the robot controller.
   }
 
-  optional uint32      sequance_number = 1; // Sequence number (to be able to detect lost messages).
+  optional uint32      sequence_number = 1; // Sequence number (to be able to detect lost messages).
   optional uint32      time_stamp      = 2; // Time stamp in milliseconds.
   optional MessageType message_type    = 3 [default = UNDEFINED];
 }
@@ -61,6 +61,13 @@ message Status
   optional RAPIDExecutionState rapid_execution_state = 4 [default = RAPID_UNDEFINED];
 }
 
+// Note: Time in seconds and microseconds since the epoch (1 Jan 1970)
+message Clock
+{
+    optional uint64 sec  = 1;
+    optional uint64 usec = 2;
+}
+
 //===========================================================
 //
 // Joint space related messages.
@@ -90,9 +97,14 @@ message JointSpace
 //
 // Cartesian space related messages.
 //
-// Note: Interpreted relative to the sensor frame defined
-//       when setting up EGM with RAPID instructions.
-//       E.g. with the EGMActPose RAPID instruction.
+// Note 1: Cartesian messages from the robot controller are
+//         relative to the work object specified when setting
+//         up EGM. E.g. with EGMActPose RAPID instructions.
+//
+// Note 2: Cartesian messages to the robot controller are
+//         interpreted relative to the sensor frame defined
+//         when setting up EGM. E.g. with EGMActPose RAPID
+//         instructions.
 //
 //===========================================================
 
@@ -111,7 +123,7 @@ message Euler
   optional double z = 3;
 }
 
-// Note: Lower priority than Euler angles.
+// Note: Lower priority than Euler angles. The quaternion is defined as: u0 + u1*i + u2*j + u3*k.
 message Quaternion
 {
   optional double u0 = 1;
@@ -162,6 +174,7 @@ message Feedback
 {  
   optional Robot    robot    = 1;
   optional External external = 2;
+  optional Clock    time     = 3;
 }
 
 // Note: The velocity sub fields are estimated from the actual EGM messages.
@@ -169,6 +182,7 @@ message Planned
 {
   optional Robot    robot    = 1;
   optional External external = 2;
+  optional Clock    time     = 3;
 }
 
 //======================================================================================================================

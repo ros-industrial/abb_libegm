@@ -624,7 +624,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::Controller::calculate(wrapper::Qu
 
 void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs, const InputContainer& inputs)
 {
-  // Lock the auxiliary data and trajectory container mutexes, they are released when the locks goes out of scope.
   boost::lock_guard<boost::mutex> data_lock(data_.mutex);
   boost::lock_guard<boost::mutex> trajectory_lock(trajectories_.mutex);
 
@@ -665,8 +664,10 @@ void EGMTrajectoryInterface::TrajectoryMotion::generateOutputs(Output* p_outputs
   // Update the execution progress.
   if(p_outputs)
   {
+    data_.execution_progress.set_state(mapCurrentState());
     data_.execution_progress.mutable_inputs()->CopyFrom(inputs.current());
     data_.execution_progress.mutable_outputs()->CopyFrom(*p_outputs);
+    data_.execution_progress.set_goal_active(data_.has_active_goal);
     data_.execution_progress.mutable_goal()->CopyFrom(motion_step_.internal_goal);
     data_.execution_progress.set_time_passed(motion_step_.data.time_passed);
     data_.execution_progress.clear_active_trajectory();
@@ -747,9 +748,12 @@ void EGMTrajectoryInterface::TrajectoryMotion::prepareDecisionData()
   }
 
   // Reset the resume flag (i.e. ignore resume order if no stop order has occurred).
-  if (!data_.pending_events.do_stop)
+  if (!data_.pending_events.do_static_goal_finish)
   {
-    data_.pending_events.do_resume = false;
+    if (!data_.pending_events.do_stop)
+    {
+      data_.pending_events.do_resume = false;
+    }
   }
 
   // Reset the static goal finish flag (i.e. ignore finish order if no static goal order has been started).
@@ -977,6 +981,27 @@ void EGMTrajectoryInterface::TrajectoryMotion::storeNormalGoal()
   }
 }
 
+wrapper::trajectory::ExecutionProgress_State EGMTrajectoryInterface::TrajectoryMotion::mapCurrentState()
+{
+  switch (data_.state)
+  {
+    case Normal:
+      return wrapper::trajectory::ExecutionProgress_State_NORMAL;
+    break;
+
+    case RampDown:
+      return wrapper::trajectory::ExecutionProgress_State_RAMP_DOWN;
+    break;
+
+    case StaticGoal:
+      return wrapper::trajectory::ExecutionProgress_State_STATIC_GOAL;
+    break;
+
+    default:
+      return wrapper::trajectory::ExecutionProgress_State_UNDEFINED;
+  }
+}
+
 /************************************************************
  * User interaction methods
  */
@@ -986,7 +1011,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::addTrajectory(const trajectory::T
 {
   boost::shared_ptr<EGMTrajectoryInterface::Trajectory> p_traj(new EGMTrajectoryInterface::Trajectory(trajectory));
 
-  // Lock the auxiliary data and trajectory container mutexes, they are released when the locks goes out of scope.
   boost::lock_guard<boost::mutex> data_lock(data_.mutex);
   boost::lock_guard<boost::mutex> trajectory_lock(trajectories_.mutex);
 
@@ -1014,7 +1038,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::addTrajectory(const trajectory::T
 
 void EGMTrajectoryInterface::TrajectoryMotion::stop(const bool discard_trajectories)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_ramp_down = true;
@@ -1024,7 +1047,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::stop(const bool discard_trajector
 
 void EGMTrajectoryInterface::TrajectoryMotion::resume()
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_resume = true;
@@ -1032,7 +1054,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::resume()
 
 void EGMTrajectoryInterface::TrajectoryMotion::updateDurationFactor(double factor)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_ramp_down = true;
@@ -1042,7 +1063,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::updateDurationFactor(double facto
 
 void EGMTrajectoryInterface::TrajectoryMotion::startStaticGoal(const bool discard_trajectories)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_ramp_down = true;
@@ -1054,7 +1074,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::startStaticGoal(const bool discar
 
 void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositionGoal& position_goal, const bool fast_transition)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_ramp_down = !fast_transition;
@@ -1068,7 +1087,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticPositio
 
 void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocityGoal& velocity_goal, const bool fast_transition)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_ramp_down = !fast_transition;
@@ -1082,7 +1100,6 @@ void EGMTrajectoryInterface::TrajectoryMotion::setStaticGoal(const StaticVelocit
 
 void EGMTrajectoryInterface::TrajectoryMotion::finishStaticGoal(const bool resume)
 {
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   data_.pending_events.do_static_goal_finish = true;
@@ -1093,7 +1110,6 @@ bool EGMTrajectoryInterface::TrajectoryMotion::retrieveExecutionProgress(traject
 {
   bool result = false;
 
-  // Lock the auxiliary data mutex, it is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(data_.mutex);
 
   if (data_.execution_progress.has_inputs())
@@ -1133,9 +1149,12 @@ trajectory_motion_(configuration)
   }
 }
 
-const std::string& EGMTrajectoryInterface::callback(const EGMServerData& server_data)
+const std::string& EGMTrajectoryInterface::callback(const UDPServerData& server_data)
 {
-  // Initialize the callback.
+  // Initialize the callback by:
+  // - Parsing and extracting data from the recieved message.
+  // - Updating any pending configuration changes.
+  // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
     // Handle demo execution or trajectory execution.
@@ -1173,7 +1192,7 @@ const std::string& EGMTrajectoryInterface::callback(const EGMServerData& server_
  * Auxiliary methods
  */
 
-bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data)
+bool EGMTrajectoryInterface::initializeCallback(const UDPServerData& server_data)
 {
   bool success = false;
 
@@ -1186,7 +1205,6 @@ bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data
   // Update configurations, if requested to do so.
   if (success && inputs_.first_message())
   {
-    // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
     boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
     if (configuration_.has_pending_update)
@@ -1201,7 +1219,23 @@ bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data
   // Extract information from the parsed message. 
   if (success)
   {
-    success = inputs_.extractParsedInformation(configuration_.active.base.axes);    
+    success = inputs_.extractParsedInformation(configuration_.active.base.axes);
+    
+    {
+      boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+
+      // Update the session data.
+      if (success)
+      {
+        session_data_.header.CopyFrom(inputs_.current().header());
+        session_data_.status.CopyFrom(inputs_.current().status());
+      }
+      else
+      {
+        session_data_.header.Clear();
+        session_data_.status.Clear();
+      }
+    }
   }
 
   // Prepare the outputs.
@@ -1220,7 +1254,6 @@ bool EGMTrajectoryInterface::initializeCallback(const EGMServerData& server_data
 
 TrajectoryConfiguration EGMTrajectoryInterface::getConfiguration()
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   return configuration_.update;
@@ -1228,7 +1261,6 @@ TrajectoryConfiguration EGMTrajectoryInterface::getConfiguration()
 
 void EGMTrajectoryInterface::setConfiguration(const TrajectoryConfiguration& configuration)
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   configuration_.update = configuration;

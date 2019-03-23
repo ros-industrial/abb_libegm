@@ -155,7 +155,7 @@ EGMBaseInterface(io_service, port_number, configuration)
   }
 }
 
-const std::string& EGMControllerInterface::callback(const EGMServerData& server_data)
+const std::string& EGMControllerInterface::callback(const UDPServerData& server_data)
 {
   // Initialize the callback by:
   // - Parsing and extracting data from the recieved message.
@@ -173,11 +173,14 @@ const std::string& EGMControllerInterface::callback(const EGMServerData& server_
     }
     else
     {
-      // Make the current inputs available (to the external control loop), and notify that it is available.
-      controller_motion_.writeInputs(inputs_.current());
+      if (inputs_.first_message() || inputs_.states_ok())
+      {
+        // Make the current inputs available (to the external control loop), and notify that it is available.
+        controller_motion_.writeInputs(inputs_.current());
 
-      // Wait for new outputs (from the external control loop), or until a timeout occurs.
-      controller_motion_.readOutputs(&outputs_.current);
+        // Wait for new outputs (from the external control loop), or until a timeout occurs.
+        controller_motion_.readOutputs(&outputs_.current);
+      }
     }
 
     // Log inputs and outputs, if set to do so.

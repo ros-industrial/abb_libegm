@@ -36,21 +36,22 @@
 
 #include <boost/bind.hpp>
 
-#include "abb_libegm/egm_server.h"
+#include "abb_libegm/egm_udp_server.h"
 
 namespace abb
 {
 namespace egm
 {
 /***********************************************************************************************************************
- * Class definitions: EGMServer
+ * Class definitions: UDPServer
  */
 
-EGMServer::EGMServer(boost::asio::io_service& io_service,
+UDPServer::UDPServer(boost::asio::io_service& io_service,
                      unsigned short port_number,
-                     AbstractEGMInterface* p_egm_interface)
+                     AbstractUDPServerInterface* p_interface)
 :
-p_egm_interface_(p_egm_interface)
+initialized_(false),
+p_interface_(p_interface)
 {
   bool success = true;
 
@@ -68,11 +69,12 @@ p_egm_interface_(p_egm_interface)
 
   if (success)
   {
-    startAsynchronousRecieve();
+    initialized_ = true;
+    startAsynchronousReceive();
   }
 }
 
-EGMServer::~EGMServer()
+UDPServer::~UDPServer()
 {
   if (p_socket_)
   {
@@ -81,35 +83,40 @@ EGMServer::~EGMServer()
   }
 }
 
-void EGMServer::startAsynchronousRecieve()
+bool UDPServer::isInitialized() const
+{
+  return initialized_;
+}
+
+void UDPServer::startAsynchronousReceive()
 {
   if (p_socket_)
   {
-    p_socket_->async_receive_from(boost::asio::buffer(recieve_buffer_),
+    p_socket_->async_receive_from(boost::asio::buffer(receive_buffer_),
                                   remote_endpoint_,
-                                  boost::bind(&EGMServer::recieveCallback,
+                                  boost::bind(&UDPServer::receiveCallback,
                                               this,
                                               boost::asio::placeholders::error,
                                               boost::asio::placeholders::bytes_transferred));
   }
 }
 
-void EGMServer::recieveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred)
+void UDPServer::receiveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred)
 {
-  server_data_.p_data = recieve_buffer_;
+  server_data_.p_data = receive_buffer_;
   server_data_.bytes_transferred = (int) bytes_transferred;
   
-  if (error == boost::system::errc::success && p_egm_interface_)
+  if (error == boost::system::errc::success && p_interface_)
   {
-    // Process the recieved data via the callback method (creates the reply message).
-    const std::string& reply = p_egm_interface_->callback(server_data_);
+    // Process the received data via the callback method (creates the reply message).
+    const std::string& reply = p_interface_->callback(server_data_);
 
     if (!reply.empty() && p_socket_)
     {
       // Send the response message to the robot controller.
       p_socket_->async_send_to(boost::asio::buffer(reply),
                                remote_endpoint_,
-                               boost::bind(&EGMServer::sendCallback,
+                               boost::bind(&UDPServer::sendCallback,
                                            this,
                                            boost::asio::placeholders::error,
                                            boost::asio::placeholders::bytes_transferred));
@@ -117,10 +124,10 @@ void EGMServer::recieveCallback(const boost::system::error_code& error, const st
   }
 
   // Add another asynchrous operation to the boost io_service object.
-  startAsynchronousRecieve();
+  startAsynchronousReceive();
 }
 
-void EGMServer::sendCallback(const boost::system::error_code& error, const std::size_t bytes_transferred) {}
+void UDPServer::sendCallback(const boost::system::error_code& error, const std::size_t bytes_transferred) {}
 
 } // end namespace egm
 } // end namespace abb

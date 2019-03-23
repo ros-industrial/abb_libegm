@@ -125,13 +125,22 @@ double EGMBaseInterface::InputContainer::estimateSampleTime()
 {
   double estimate = 0.0;
 
-  if (current_.has_header() && previous_.has_header())
+  if (current_.has_feedback() && previous_.has_feedback() &&
+      current_.feedback().has_time() && previous_.feedback().has_time() &&
+      current_.feedback().time().has_sec() && previous_.feedback().time().has_sec() &&
+      current_.feedback().time().has_usec() && previous_.feedback().time().has_usec())
   {
-    double temp = (double) (current_.header().time_stamp() - previous_.header().time_stamp());
-    estimate = temp*Constants::Conversion::MS_TO_S;
+    google::protobuf::uint64 diff_s = (current_.feedback().time().sec() - previous_.feedback().time().sec());
+    google::protobuf::uint64 diff_us = (current_.feedback().time().usec() - previous_.feedback().time().usec());
+    if (diff_s > 0)
+    {
+      diff_us += diff_s*((google::protobuf::uint64) Constants::Conversion::S_TO_US);
+    }
+
+    estimate = std::floor(((double) diff_us) * Constants::Conversion::MS_TO_S) * Constants::Conversion::MS_TO_S;
   }
-  
-  if (estimate <= 0.0)
+
+  if (estimate < Constants::RobotController::LOWEST_SAMPLE_TIME)
   {
     estimate = Constants::RobotController::LOWEST_SAMPLE_TIME;
   }
@@ -655,7 +664,7 @@ EGMBaseInterface::EGMBaseInterface(boost::asio::io_service& io_service,
                                    const unsigned short port_number,
                                    const BaseConfiguration& configuration)
 :
-egm_server_(io_service, port_number, this),
+udp_server_(io_service, port_number, this),
 configuration_(configuration)
 {
   if (configuration_.active.use_logging)
@@ -666,9 +675,12 @@ configuration_(configuration)
   }
 }
 
-const std::string& EGMBaseInterface::callback(const EGMServerData& server_data)
+const std::string& EGMBaseInterface::callback(const UDPServerData& server_data)
 {
-  // Initialize the callback.
+  // Initialize the callback by:
+  // - Parsing and extracting data from the recieved message.
+  // - Updating any pending configuration changes.
+  // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
     // Handle demo execution.
@@ -733,7 +745,7 @@ void EGMBaseInterface::logData(const InputContainer& inputs, const OutputContain
   }
 }
 
-bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
+bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
 {
   bool success = false;
 
@@ -759,6 +771,22 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
   if (success)
   {
     success = inputs_.extractParsedInformation(configuration_.active.axes);
+
+    {
+      boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+
+      // Update the session data.
+      if (success)
+      {
+        session_data_.header.CopyFrom(inputs_.current().header());
+        session_data_.status.CopyFrom(inputs_.current().status());
+      }
+      else
+      {
+        session_data_.header.Clear();
+        session_data_.status.Clear();
+      }
+    }
   }
 
   // Prepare the outputs.
@@ -775,9 +803,55 @@ bool EGMBaseInterface::initializeCallback(const EGMServerData& server_data)
  * User interaction methods
  */
 
+bool EGMBaseInterface::isInitialized()
+{
+  return udp_server_.isInitialized();
+}
+
+bool EGMBaseInterface::isConnected()
+{
+  wrapper::Header header_1;
+  wrapper::Header header_2;
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_1.CopyFrom(session_data_.header);
+  }
+
+  boost::this_thread::sleep(boost::posix_time::milliseconds(WAIT_TIME_MS));
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    header_2.CopyFrom(session_data_.header);
+  }
+
+  // Check for if an EGM communication session is connected or not. This is determined by comparing
+  // two header messages, received at two different time instances, according to:
+  // 1. Both headers must have a sequence number and a time stamp.
+  // 2. The sequence number of the second header must be larger than that of the first header.
+  // 3. The time stamp of the second header must be larger than that of the first header.
+  // 4. The difference in time stamp must be near the wait time.
+  return (header_1.has_sequence_number() && header_1.has_time_stamp()) &&
+         (header_2.has_sequence_number() && header_2.has_time_stamp()) &&
+         (header_2.sequence_number() > header_1.sequence_number()) &&
+         (header_2.time_stamp() > header_1.time_stamp()) &&
+         (header_2.time_stamp() - header_1.time_stamp() <= 2 * WAIT_TIME_MS);
+};
+
+wrapper::Status EGMBaseInterface::getStatus()
+{
+  wrapper::Status status;
+
+  {
+    boost::lock_guard<boost::mutex> lock(session_data_.mutex);
+    status.CopyFrom(session_data_.status);
+  }
+
+  return status;
+};
+
 BaseConfiguration EGMBaseInterface::getConfiguration()
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   return configuration_.update;
@@ -785,7 +859,6 @@ BaseConfiguration EGMBaseInterface::getConfiguration()
 
 void EGMBaseInterface::setConfiguration(const BaseConfiguration& configuration)
 {
-  // Lock the interface's configuration mutex. It is released when the lock goes out of scope.
   boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
   configuration_.update = configuration;

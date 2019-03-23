@@ -563,7 +563,7 @@ bool parse(wrapper::Header* p_target, const EgmHeader& source)
 
   if (p_target && source.has_seqno() && source.has_tm() && source.has_mtype())
   {
-    p_target->set_sequance_number(source.seqno());
+    p_target->set_sequence_number(source.seqno());
     p_target->set_time_stamp(source.tm());
 
     switch (source.mtype())
@@ -691,6 +691,23 @@ bool parse(wrapper::Status* p_target, const EgmRobot& source)
   return success;
 }
 
+bool parse(wrapper::Clock* p_target, const EgmClock& source)
+{
+  bool success = true;
+
+  if (p_target && source.has_sec() && source.has_usec())
+  {
+    p_target->set_sec(source.sec());
+    p_target->set_usec(source.usec());
+  }
+  else
+  {
+    success = false;
+  }
+
+  return success;
+}
+
 bool parse(wrapper::Joints* p_target_robot,
            wrapper::Joints* p_target_external,
            const EgmJoints& source_robot,
@@ -712,12 +729,12 @@ bool parse(wrapper::Joints* p_target_robot,
         {
           for (int i = 0; i < source_robot.joints_size(); ++i)
           {
-            p_target_robot->add_values(source_robot.joints(i) * Constants::Conversion::RAD_TO_DEG);
+            p_target_robot->add_values(source_robot.joints(i));
           }
 
           for (int i = 0; i < source_external.joints_size(); ++i)
           {
-            p_target_external->add_values(source_external.joints(i) * Constants::Conversion::RAD_TO_DEG);
+            p_target_external->add_values(source_external.joints(i));
           }
 
           success = true;
@@ -731,17 +748,17 @@ bool parse(wrapper::Joints* p_target_robot,
         if (source_robot.joints_size() == Constants::RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS &&
             source_external.joints_size() >= 1)
         {
-          p_target_robot->add_values(source_robot.joints(0) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_robot.joints(1) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_external.joints(0) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_robot.joints(2) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_robot.joints(3) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_robot.joints(4) * Constants::Conversion::RAD_TO_DEG);
-          p_target_robot->add_values(source_robot.joints(5) * Constants::Conversion::RAD_TO_DEG);
+          p_target_robot->add_values(source_robot.joints(0));
+          p_target_robot->add_values(source_robot.joints(1));
+          p_target_robot->add_values(source_external.joints(0));
+          p_target_robot->add_values(source_robot.joints(2));
+          p_target_robot->add_values(source_robot.joints(3));
+          p_target_robot->add_values(source_robot.joints(4));
+          p_target_robot->add_values(source_robot.joints(5));
 
           for (int i = 1; i < source_external.joints_size(); ++i)
           {
-            p_target_external->add_values(source_external.joints(i) * Constants::Conversion::RAD_TO_DEG);
+            p_target_external->add_values(source_external.joints(i));
           }
 
           success = true;
@@ -821,6 +838,11 @@ bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAx
     if (success)
     {
       success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+
+      if (success)
+      {
+        success = parse(p_target->mutable_time(), source.time());
+      }
     }
   }
 
@@ -840,8 +862,14 @@ bool parse(wrapper::Planned* p_target, const EgmPlanned& source, const RobotAxes
     if (success)
     {
       success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+
+      if (success)
+      {
+        success = parse(p_target->mutable_time(), source.time());
+      }
     }
   }
+
   return success;
 }
 
