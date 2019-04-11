@@ -90,8 +90,10 @@ public:
    *
    * \param trajectory containing the trajectory to add.
    * \param override_trajectories indicating if all pending trajectories should be overridden (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void addTrajectory(const wrapper::trajectory::TrajectoryGoal trajectory, const bool override_trajectories = false);
+  bool addTrajectory(const wrapper::trajectory::TrajectoryGoal trajectory, const bool override_trajectories = false);
 
   /**
    * \brief Stop the trajectory motion execution.
@@ -100,55 +102,69 @@ public:
    *       EGM communication session completely. A resume normally needs to be ordered for execution to start again.
    *
    * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void stop(const bool discard_trajectories = false);
+  bool stopTrajectory(const bool discard_trajectories = false);
 
   /**
    * \brief Resume the trajectory motion execution (after a stop has occurred).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void resume();
+  bool resumeTrajectory();
 
   /**
    * \brief Update the duration scaling factor for trajectory goals.
-   * 
+   *
    * Note: Only values between 1.0 and 5.0 will be considered. E.g. if the factor is 2.0,
    *       then the remaining duration will be doubled. As will all upcoming goal durations.
    *
    * \param factor containing the new scale factor.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void updateDurationFactor(double factor);
-  
+  bool updateDurationFactor(double factor);
+
   /**
    * \brief Start to follow a static goal.
-   * 
+   *
    * Note: Any current trajectory motions will be stopped before starting to follow the static goal.
    *
    * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void startStaticGoal(const bool discard_trajectories = false);
-  
+  bool startStaticGoal(const bool discard_trajectories = false);
+
   /**
    * \brief Set a static position goal to follow.
    *
    * \param position_goal containing the static position goal to follow.
    * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition = false);
-  
+  bool setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition = false);
+
   /**
    * \brief Set a static velocity goal to follow.
    *
    * \param velocity_goal containing the static velocity goal to follow.
    * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition = false);
+  bool setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition = false);
 
   /**
    * \brief Finish following a static goal.
    *
    * \param resume indicating if normal trajectory motion execution should be resumed automatically.
+   *
+   * \return bool indicating if the interface accepted the command or not.
    */
-  void finishStaticGoal(const bool resume = false);
+  bool finishStaticGoal(const bool resume = false);
   
   /**
    * \brief Retrieve an execution progress from the trajectory interface.
@@ -341,8 +357,10 @@ private:
      *
      * \param trajectory containing the trajectory to add.
      * \param override_trajectories indicating if all pending trajectories should be overridden (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void addTrajectory(const wrapper::trajectory::TrajectoryGoal& trajectory, const bool override_trajectories);
+    bool addTrajectory(const wrapper::trajectory::TrajectoryGoal& trajectory, const bool override_trajectories);
 
     /**
      * \brief Stop the trajectory motion execution.
@@ -350,55 +368,69 @@ private:
      * Note: A resume normally needs to be ordered for execution to start again.
      *
      * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void stop(const bool discard_trajectories);
+    bool stopTrajectory(const bool discard_trajectories);
 
     /**
      * \brief Resume the trajectory motion execution (after a stop has occurred).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void resume();
-    
+    bool resumeTrajectory();
+
     /**
      * \brief Update the duration scaling factor for trajectory goals.
-     * 
+     *
      * Note: Only values between 1.0 and 5.0 will be considered. E.g. if the factor is 2.0,
      *       then the remaining duration will be doubled. As will all upcoming goal durations.
      *
      * \param factor containing the new scale factor.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void updateDurationFactor(double factor);
-  
+    bool updateDurationFactor(double factor);
+
     /**
      * \brief Start to follow a static goal.
-     * 
+     *
      * Note: Any current trajectory motions will be stopped before starting to follow the static goal.
      *
      * \param discard_trajectories indicating if all pending trajectories should be discarded (i.e. removed).
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void startStaticGoal(const bool discard_trajectories);
+    bool startStaticGoal(const bool discard_trajectories);
 
     /**
      * \brief Set a static position goal to follow.
      *
      * \param position_goal containing the static position goal to follow.
      * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
-  
+    bool setStaticGoal(const wrapper::trajectory::StaticPositionGoal& position_goal, const bool fast_transition);
+
     /**
      * \brief Set a static velocity goal to follow.
      *
      * \param velocity_goal containing the static velocity goal to follow.
      * \param fast_transition indicating if a fast transition should be done. I.e. skip ramp out of current goal.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
+    bool setStaticGoal(const wrapper::trajectory::StaticVelocityGoal& velocity_goal, const bool fast_transition);
 
     /**
      * \brief Finish following a static goal.
      *
      * \param resume indicating if normal trajectory motion execution should be resumed automatically.
+     *
+     * \return bool indicating if the interface accepted the command or not.
      */
-    void finishStaticGoal(const bool resume);
+    bool finishStaticGoal(const bool resume);
     
     /**
      * \brief Retrieve an execution progress from the trajectory interface.
@@ -531,11 +563,9 @@ private:
       :
       has_new_goal(false),
       has_active_goal(false),
-      state(Normal),
-      sub_state(None),
       has_updated_execution_progress(false)
       {}
-
+      
       /**
        * \brief Flag indicating if there is a new goal.
        *
@@ -547,16 +577,6 @@ private:
        * \brief Flag indicating if there is an active goal.
        */
       bool has_active_goal;
-
-      /**
-       * \brief The current state.
-       */
-      States state;
-
-      /**
-       * \brief The current sub state.
-       */
-      SubStates sub_state;
 
       /**
        * \brief The pending events for the trajectory motion execution.
@@ -603,6 +623,147 @@ private:
        * \brief Mutex for protecting the data.
        */
       boost::mutex mutex;
+    };
+
+    /**
+     * \brief Class for managing the interface's internal states.
+     */
+    class StateManager
+    {
+    public:
+      /**
+       * \brief Default constructor.
+       */
+      StateManager()
+      :
+      has_pending_state_(false),
+      current_state_(Normal),
+      current_sub_state_(None),
+      pending_state_(Normal),
+      pending_sub_state_(None)
+      {}
+
+      /**
+       * \brief Activate the state manager.
+       */
+      void activateStateManager()
+      {
+        current_state_ = Normal;
+        current_sub_state_ = Running;
+      }
+
+      /**
+       * \brief Reset the state manager.
+       */
+      void resetStateManager()
+      {
+        current_state_ = Normal;
+        current_sub_state_ = None;
+        pending_state_ = Normal;
+        pending_sub_state_ = None;
+        has_pending_state_ = false;
+      }
+
+      /**
+       * \brief Get the current state.
+       */
+      States getState()
+      {
+        return current_state_;
+      }
+
+      /**
+       * \brief Get the current sub state.
+       */
+      SubStates getSubState()
+      {
+        return current_sub_state_;
+      }
+
+      /**
+       * \brief Set the desired pending state and sub state.
+       *
+       * \param desired_state specifying the desired state.
+       * \param desired_sub_state specifying the desired sub state.
+       */
+      void setPendingState(const States& desired_state, const SubStates& desired_sub_state);
+
+      /**
+       * \brief Update the state and sub state.
+       */
+      void updateState()
+      {
+        if (has_pending_state_)
+        {
+          current_state_ = pending_state_;
+          current_sub_state_ = pending_sub_state_;
+          has_pending_state_ = false;
+        }
+      }
+
+      /**
+       * \brief Verify the interface's current state and sub state.
+       *
+       * \param state specifying the state to verify.
+       * \param sub_state specifying the sub state to verify.
+       *
+       * \return bool indicating if the state and sub state has been verified.
+       */
+      bool verifyState(const States& state, const SubStates& sub_state)
+      {
+        return (current_state_ == state && current_sub_state_ == sub_state);
+      }
+
+      /**
+       * \brief Maps the interface's current internal state to an execution progress state.
+       *
+       * The interface can be in any of the following states:
+       * - Undefined state (should never occur).
+       * - Normal state (references are generated from trajectories specified by a user).
+       * - Ramp down state (ramping down any current references).
+       * - Static goal state (references are generated from a single goal point specified by a user).
+       *
+       * \return ExecutionProgress_State with the execution progress state.
+       */
+      wrapper::trajectory::ExecutionProgress_State mapState();
+
+      /**
+       * \brief Maps the interface's current internal sub state to an execution progress sub state.
+       *
+       * The interface can be in any of the following sub states (depending on the current state):
+       * - None sub state (the current state is not active yet).
+       * - Running sub state (the current state is running).
+       * - Finished sub state (the current state has finished).
+       *
+       * \return ExecutionProgress_SubState with the execution progress sub state.
+       */
+      wrapper::trajectory::ExecutionProgress_SubState mapSubState();
+
+    private:
+      /**
+       * \brief Flag indicating if there are any pending state change.
+       */
+      bool has_pending_state_;
+
+      /**
+       * \brief The current state.
+       */
+      States current_state_;
+
+      /**
+       * \brief The current sub state.
+       */
+      SubStates current_sub_state_;
+
+      /**
+       * \brief The pending state.
+       */
+      States pending_state_;
+
+      /**
+       * \brief The pending sub state.
+       */
+      SubStates pending_sub_state_;
     };
 
     /**
@@ -1028,12 +1189,7 @@ private:
      * \brief Reset the trajectory motion data.
      */
     void resetTrajectoryMotion();
-
-    /**
-     * \brief Prepare the decision data.
-     */
-    void prepareDecisionData();
-    
+        
     /**
      * \brief Process the normal state.
      */
@@ -1060,19 +1216,6 @@ private:
     void storeNormalGoal();
 
     /**
-     * \brief Maps the interface's current internal state to an execution progress state.
-     *
-     * The interface can be in any of the following states:
-     * - Undefined state (should not occur).
-     * - Normal state (references are generated from trajectories specified by a user).
-     * - Ramp down state (ramping down any current references).
-     * - Static goal state (references are generated from a single goal point specified by a user).
-     *
-     * \return ExecutionProgress_State with the execution progress state.
-     */
-    wrapper::trajectory::ExecutionProgress_State mapCurrentState();
-
-    /**
      * \brief Constant for the minimum duration scale factor.
      */
     const double DURATION_FACTOR_MIN;
@@ -1086,6 +1229,11 @@ private:
      * \brief Data for making decisions during the execution of trajectory motions.
      */
     DecisionData data_;
+
+    /**
+     * \brief Manager for the interface's internal states.
+     */
+    StateManager state_manager_;
 
     /**
      * \brief Manager for the motion steps, i.e. handle current goal and generating interpolation output.
