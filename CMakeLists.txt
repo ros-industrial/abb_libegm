@@ -79,3 +79,6 @@ install(DIRECTORY include
         
 install(FILES ${EgmProtoHeaders}
         DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/include/${PROJECT_NAME})
+
+install(FILES ${EgmProtoFiles}
+        DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}/include/${PROJECT_NAME})
