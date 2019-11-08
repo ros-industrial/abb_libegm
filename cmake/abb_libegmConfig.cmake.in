@@ -1,0 +1,16 @@
+# - Config file for the abb_libegm package
+# It defines the following variables
+#  abb_libegm_INCLUDE_DIRS - include directories for FooBar
+#  abb_libegm_LIBRARIES    - libraries to link against
+#  abb_libegm_EXECUTABLE   - the bar executable
+
+set(abb_libegm_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+include("${abb_libegm_DIR}/export_abb_libegm.cmake")
+
+# These are IMPORTED targets created by abb_libegmTargets.cmake
+set(abb_libegm_LIBRARIES abb_libegm)
+
+# Extras for our library (exports the dependency on pthread)
+include("${abb_libegm_DIR}/abb_libegm-extras.cmake")
