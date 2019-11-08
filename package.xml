@@ -1,22 +1,20 @@
 <?xml version="1.0"?>
-<package>
+<?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
+<package format="3">
   <name>abb_libegm</name>
   <version>1.0.0</version>
-  <description>The abb_libegm package for easing the use of ABB Externally Guided Motion (EGM) product</description>
-
+  <description>Package for easing the use of ABB's Externally Guided Motion (EGM) product</description>
   <maintainer email="jon.tjerngren@se.abb.com">Jon Tjerngren</maintainer>
-
   <license>BSD 3-Clause</license>
-
+  <url type="repository">https://github.com/ros-industrial/abb_libegm</url>
   <author email="jon.tjerngren@se.abb.com">Jon Tjerngren</author>
 
-  <url type="repository">https://github.com/ros-industrial/abb_libegm</url>
+  <buildtool_depend>cmake</buildtool_depend>
 
-  <buildtool_depend>catkin</buildtool_depend>
+  <depend>boost</depend>
+  <depend>protobuf-dev</depend>
 
-  <build_depend>boost</build_depend>
-  <build_depend>protobuf-dev</build_depend>
-
-  <run_depend>boost</run_depend>
-  <run_depend>protobuf</run_depend>
+  <export>
+    <build_type>cmake</build_type>
+  </export>
 </package>
