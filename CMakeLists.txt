@@ -8,23 +8,32 @@ set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_M
 
 include(GNUInstallDirs)
 
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
+
 #########################
 ## Boost C++ Libraries ##
 #########################
-find_package(Boost REQUIRED COMPONENTS system thread)
+find_package(Boost REQUIRED COMPONENTS system thread regex)
 
 #############################
 ## Google Protocol Buffers ##
 #############################
-find_package(Protobuf REQUIRED)
+if(WIN32)
+  # The protobuf compiler appears to be default installed at ${_CMAKE_INSTALL_DIR}/tools/protobuf,
+  # and find_package() doesn't always seem to find it without specifying a hint.
+  find_package(Protobuf REQUIRED HINTS ${_CMAKE_INSTALL_DIR}/tools/protobuf)
+else()
+  find_package(Protobuf REQUIRED)
+endif()
 
 # Work around Protobuf exporting 'lpthread' as a library: we
 # export the dependency on pthread using the configuration files.
 list(REMOVE_ITEM Protobuf_LIBRARIES "-lpthread")
 
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
-find_program(Protobuf_PROTOC_LOC NAMES protoc)
-if(NOT Protobuf_PROTOC_LOC)
+if(NOT Protobuf_PROTOC_EXECUTABLE)
   message(FATAL_ERROR "Cannot find required 'protoc', cannot process Protobuf files without it. Aborting.")
 endif()
 
