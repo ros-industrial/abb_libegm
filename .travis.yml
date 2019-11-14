@@ -1,6 +1,6 @@
-sudo: required
 language: generic
-dist: trusty
+services:
+  - docker
 
 env:
   matrix:
@@ -8,7 +8,7 @@ env:
     - ROS_DISTRO="dashing" ROS_REPO=ros NOT_TEST_INSTALL=true
 
 install:
-  - git clone --depth=1 https://github.com/ros-industrial/industrial_ci.git .ci_config
+  - git clone --depth=1 -b master https://github.com/ros-industrial/industrial_ci.git .ci_config
 
 script:
   - .ci_config/travis.sh
