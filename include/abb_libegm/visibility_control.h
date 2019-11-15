@@ -12,10 +12,14 @@
     #define ABB_LIBEGM_EXPORT __declspec(dllexport)
     #define ABB_LIBEGM_IMPORT __declspec(dllimport)
   #endif
-  #ifdef ABB_LIBEGM_BUILDING_LIBRARY
-    #define ABB_LIBEGM_PUBLIC ABB_LIBEGM_EXPORT
+  #ifdef ABB_LIBEGM_STATIC_LIBRARY
+    #define ABB_LIBEGM_PUBLIC
   #else
-    #define ABB_LIBEGM_PUBLIC ABB_LIBEGM_IMPORT
+    #ifdef ABB_LIBEGM_BUILDING_SHARED_LIBRARY
+      #define ABB_LIBEGM_PUBLIC ABB_LIBEGM_EXPORT
+    #else
+      #define ABB_LIBEGM_PUBLIC ABB_LIBEGM_IMPORT
+    #endif
   #endif
   #define ABB_LIBEGM_PUBLIC_TYPE ABB_LIBEGM_PUBLIC
   #define ABB_LIBEGM_LOCAL

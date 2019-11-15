@@ -82,9 +82,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   ${PROTOBUF_LIBRARIES}
 )
 
-# Causes the visibility macros to use dllexport rather than dllimport,
-# which is appropriate when building the dll but not consuming it.
-target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_BUILDING_LIBRARY")
+if(BUILD_SHARED_LIBS)
+  # Causes the visibility macros to use dllexport rather than dllimport,
+  # which is appropriate when building the dll but not consuming it.
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_BUILDING_SHARED_LIBRARY")
+else()
+  target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_STATIC_LIBRARY")
+endif()
 
 #############
 ## Install ##
