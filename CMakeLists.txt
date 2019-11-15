@@ -1,10 +1,15 @@
-cmake_minimum_required(VERSION 3.6)
-project(abb_libegm)
+cmake_minimum_required(VERSION 3.5)
 
-set(${PROJECT_NAME}_MAJOR_VERSION 1)
-set(${PROJECT_NAME}_MINOR_VERSION 0)
-set(${PROJECT_NAME}_PATCH_VERSION 0)
-set(${PROJECT_NAME}_VERSION ${${PROJECT_NAME}_MAJOR_VERSION}.${${PROJECT_NAME}_MINOR_VERSION}.${${PROJECT_NAME}_PATCH_VERSION})
+# Read version from the package.xml file.
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/package.xml package_xml_str)
+if(NOT package_xml_str MATCHES "<version>([0-9]+.[0-9]+.[0-9]+)</version>")
+  message(FATAL_ERROR "Could not parse project version from package.xml. Aborting.")
+endif()
+
+# At this point we either have a proper version string, or we've errored
+# out with a FATAL_ERROR above. So assume CMAKE_MATCH_1 contains our
+# package's version.
+project(abb_libegm VERSION ${CMAKE_MATCH_1} LANGUAGES CXX)
 
 include(GNUInstallDirs)
 
@@ -30,10 +35,10 @@ endif()
 
 # Work around Protobuf exporting 'lpthread' as a library: we
 # export the dependency on pthread using the configuration files.
-list(REMOVE_ITEM Protobuf_LIBRARIES "-lpthread")
+list(REMOVE_ITEM PROTOBUF_LIBRARIES "-lpthread")
 
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
-if(NOT Protobuf_PROTOC_EXECUTABLE)
+if(NOT PROTOBUF_PROTOC_EXECUTABLE)
   message(FATAL_ERROR "Cannot find required 'protoc', cannot process Protobuf files without it. Aborting.")
 endif()
 
@@ -48,6 +53,10 @@ protobuf_generate_cpp(EgmProtoSources EgmProtoHeaders ${EgmProtoFiles})
 ###########
 ## Build ##
 ###########
+if(NOT DEFINED BUILD_SHARED_LIBS)
+  option(BUILD_SHARED_LIBS "Build dynamically-linked binaries" ON)
+endif()
+
 set(
   SRC_FILES
     src/egm_base_interface.cpp
@@ -61,16 +70,16 @@ set(
     ${EgmProtoSources}
 )
 
-add_library(${PROJECT_NAME} SHARED ${SRC_FILES})
+add_library(${PROJECT_NAME} ${SRC_FILES})
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include>
   PUBLIC ${Boost_INCLUDE_DIRS}
-  PUBLIC ${Protobuf_INCLUDE_DIRS}
+  PUBLIC ${PROTOBUF_INCLUDE_DIRS}
 )
-target_link_libraries(${PROJECT_NAME}
- ${Boost_LIBRARIES}
- ${Protobuf_LIBRARIES}
+target_link_libraries(${PROJECT_NAME} PUBLIC
+  ${Boost_LIBRARIES}
+  ${PROTOBUF_LIBRARIES}
 )
 
 # Causes the visibility macros to use dllexport rather than dllimport,
@@ -100,44 +109,47 @@ install(
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
 
-# Export targets.
-set(export_targets ${export_targets};${PROJECT_NAME})
-export(
-  EXPORT export_${PROJECT_NAME}
-  FILE "${PROJECT_BINARY_DIR}/export_${PROJECT_NAME}.cmake"
-)
+include(CMakePackageConfigHelpers)
 
 # Create the ${PROJECT_NAME}Config.cmake.
-set(CONF_INCLUDE_DIRS "${CMAKE_INSTALL_PREFIX}/include")
 configure_file(
   ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in
   "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake" @ONLY
 )
 
 # Create the ${PROJECT_NAME}ConfigVersion.cmake.
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}ConfigVersion.cmake.in
-  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake" @ONLY
+write_basic_package_version_file(
+  ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+  COMPATIBILITY AnyNewerVersion
 )
 
-# Create the ${PROJECT_NAME}-extras.cmake.
+# Create the ${PROJECT_NAME}Extras.cmake.
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}-extras.cmake.in
-  "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}-extras.cmake" @ONLY
+  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Extras.cmake.in
+  "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Extras.cmake" @ONLY
 )
 
 install(
   FILES
     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}-extras.cmake"
+    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Extras.cmake"
   DESTINATION "share/${PROJECT_NAME}/cmake"
   COMPONENT dev
+)
+
+# Export targets.
+set(export_targets ${export_targets};${PROJECT_NAME})
+export(
+  EXPORT export_${PROJECT_NAME}
+  FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Targets.cmake"
+  NAMESPACE ${PROJECT_NAME}::
 )
 
 install(
   EXPORT export_${PROJECT_NAME}
   DESTINATION "share/${PROJECT_NAME}/cmake"
-  FILE export_${PROJECT_NAME}.cmake
+  FILE ${PROJECT_NAME}Targets.cmake
+  NAMESPACE ${PROJECT_NAME}::
   COMPONENT dev
 )

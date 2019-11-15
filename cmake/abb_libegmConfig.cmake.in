@@ -2,15 +2,15 @@
 # It defines the following variables
 #  abb_libegm_INCLUDE_DIRS - include directories for FooBar
 #  abb_libegm_LIBRARIES    - libraries to link against
-#  abb_libegm_EXECUTABLE   - the bar executable
-
-set(abb_libegm_INCLUDE_DIRS "@CONF_INCLUDE_DIRS@")
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("${abb_libegm_DIR}/export_abb_libegm.cmake")
-
-# These are IMPORTED targets created by abb_libegmTargets.cmake
-set(abb_libegm_LIBRARIES abb_libegm)
+include("${CMAKE_CURRENT_LIST_DIR}/abb_libegmTargets.cmake")
 
 # Extras for our library (exports the dependency on pthread)
-include("${abb_libegm_DIR}/abb_libegm-extras.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/abb_libegmExtras.cmake")
+
+# Extract include directories property from the imported target
+get_target_property(abb_libegm_INCLUDE_DIRS abb_libegm::abb_libegm INTERFACE_INCLUDE_DIRECTORIES)
+
+# These are IMPORTED targets created by abb_libegmTargets.cmake
+set(abb_libegm_LIBRARIES abb_libegm::abb_libegm)
