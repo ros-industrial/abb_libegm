@@ -26,16 +26,13 @@ find_package(Boost REQUIRED COMPONENTS system thread regex)
 ## Google Protocol Buffers ##
 #############################
 if(WIN32)
-  # The protobuf compiler appears to be default installed at ${_CMAKE_INSTALL_DIR}/tools/protobuf,
-  # and find_package() doesn't always seem to find it without specifying a hint.
+  # For a Chocolatey-based ROS/ROS2 installation, then it appears that the protobuf compiler is
+  # by default installed at ${_CMAKE_INSTALL_DIR}/tools/protobuf, and find_package() doesn't
+  # always seem to find the compiler without specifying a hint.
   find_package(Protobuf REQUIRED HINTS ${_CMAKE_INSTALL_DIR}/tools/protobuf)
 else()
   find_package(Protobuf REQUIRED)
 endif()
-
-# Work around Protobuf exporting 'lpthread' as a library: we
-# export the dependency on pthread using the configuration files.
-list(REMOVE_ITEM PROTOBUF_LIBRARIES "-lpthread")
 
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
 if(NOT PROTOBUF_PROTOC_EXECUTABLE)
@@ -49,6 +46,15 @@ if(NOT QUIET)
   message(STATUS "Generating protobuf C++ for: ${EgmProtoFiles}")
 endif()
 protobuf_generate_cpp(EgmProtoSources EgmProtoHeaders ${EgmProtoFiles})
+
+#############
+## Threads ##
+#############
+find_package(Threads REQUIRED)
+
+# Work around Protobuf exporting 'lpthread' as a library: we let the
+# previous find_package(...) determine the system's thread library.
+list(REMOVE_ITEM PROTOBUF_LIBRARIES "-lpthread")
 
 ###########
 ## Build ##
@@ -71,6 +77,7 @@ set(
 )
 
 add_library(${PROJECT_NAME} ${SRC_FILES})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:include>
@@ -80,6 +87,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} PUBLIC
   ${Boost_LIBRARIES}
   ${PROTOBUF_LIBRARIES}
+  Threads::Threads
 )
 
 if(BUILD_SHARED_LIBS)
@@ -126,18 +134,10 @@ write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   COMPATIBILITY AnyNewerVersion
 )
-
-# Create the ${PROJECT_NAME}Extras.cmake.
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Extras.cmake.in
-  "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Extras.cmake" @ONLY
-)
-
 install(
   FILES
     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
-    "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Extras.cmake"
   DESTINATION "share/${PROJECT_NAME}/cmake"
   COMPONENT dev
 )
