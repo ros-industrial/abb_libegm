@@ -87,7 +87,7 @@ if(BUILD_SHARED_LIBS)
   # which is appropriate when building the dll but not consuming it.
   target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_BUILDING_SHARED_LIBRARY")
 else()
-  target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_STATIC_LIBRARY")
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "ABB_LIBEGM_STATIC_LIBRARY")
 endif()
 
 #############
