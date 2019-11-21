@@ -3,7 +3,7 @@
 <package format="3">
   <name>abb_libegm</name>
   <version>1.0.0</version>
-  <description>Package for easing the use of ABB's Externally Guided Motion (EGM) product</description>
+  <description>A C++ library for interfacing with ABB robot controllers supporting Externally Guided Motion (689-1)</description>
   <maintainer email="jon.tjerngren@se.abb.com">Jon Tjerngren</maintainer>
   <license>BSD 3-Clause</license>
   <url type="repository">https://github.com/ros-industrial/abb_libegm</url>
