@@ -1,18 +1,15 @@
 # - Config file for the abb_libegm package
-# It defines the following variables
-#  abb_libegm_INCLUDE_DIRS - include directories for FooBar
-#  abb_libegm_LIBRARIES    - libraries to link against
+# It defines the following variable
+#  abb_libegm_LIBRARIES - libraries to link against
 
 include(CMakeFindDependencyMacro)
 
-# Find Threads dependency (e.g. for pthread).
+# Find dependencies
 find_dependency(Threads REQUIRED)
+find_dependency(Boost REQUIRED COMPONENTS regex system thread)
 
 # Our library dependencies (contains definitions for IMPORTED targets)
-include("${CMAKE_CURRENT_LIST_DIR}/abb_libegmTargets.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")
 
-# Extract include directories property from the imported target
-get_target_property(abb_libegm_INCLUDE_DIRS abb_libegm::abb_libegm INTERFACE_INCLUDE_DIRECTORIES)
-
-# These are IMPORTED targets created by abb_libegmTargets.cmake
-set(abb_libegm_LIBRARIES abb_libegm::abb_libegm)
+# These are IMPORTED targets created by @PROJECT_NAME@Targets.cmake
+set(abb_libegm_LIBRARIES @PROJECT_NAME@::@PROJECT_NAME@)

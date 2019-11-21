@@ -20,7 +20,7 @@ endif()
 #########################
 ## Boost C++ Libraries ##
 #########################
-find_package(Boost REQUIRED COMPONENTS system thread regex)
+find_package(Boost REQUIRED COMPONENTS regex system thread)
 
 #############################
 ## Google Protocol Buffers ##
@@ -78,14 +78,17 @@ set(
 
 add_library(${PROJECT_NAME} ${SRC_FILES})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
-  PUBLIC ${Boost_INCLUDE_DIRS}
-  PUBLIC ${PROTOBUF_INCLUDE_DIRS}
+  ${PROTOBUF_INCLUDE_DIRS}
 )
+
 target_link_libraries(${PROJECT_NAME} PUBLIC
-  ${Boost_LIBRARIES}
+  Boost::regex
+  Boost::system
+  Boost::thread
   ${PROTOBUF_LIBRARIES}
   Threads::Threads
 )
@@ -139,7 +142,6 @@ install(
     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"
     "${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}
-  COMPONENT dev
 )
 
 # Export targets.
@@ -155,5 +157,4 @@ install(
   DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/${PROJECT_NAME}
   FILE ${PROJECT_NAME}Targets.cmake
   NAMESPACE ${PROJECT_NAME}::
-  COMPONENT dev
 )
