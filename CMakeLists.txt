@@ -79,6 +79,9 @@ set(
 add_library(${PROJECT_NAME} ${SRC_FILES})
 add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
 target_include_directories(${PROJECT_NAME} PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include;${CMAKE_CURRENT_BINARY_DIR}>"
   $<INSTALL_INTERFACE:$<INSTALL_PREFIX>/include>
@@ -93,12 +96,8 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
   Threads::Threads
 )
 
-if(BUILD_SHARED_LIBS)
-  # Causes the visibility macros to use dllexport rather than dllimport,
-  # which is appropriate when building the dll but not consuming it.
-  target_compile_definitions(${PROJECT_NAME} PRIVATE "ABB_LIBEGM_BUILDING_SHARED_LIBRARY")
-else()
-  target_compile_definitions(${PROJECT_NAME} PUBLIC "ABB_LIBEGM_STATIC_LIBRARY")
+if(NOT BUILD_SHARED_LIBS)
+  target_compile_definitions(${PROJECT_NAME} PUBLIC "ABB_LIBEGM_STATIC_DEFINE")
 endif()
 
 #############
@@ -113,6 +112,7 @@ install(
   FILES
     ${EgmProtoFiles}
     ${EgmProtoHeaders}
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}_export.h
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${PROJECT_NAME}
 )
 
@@ -137,6 +137,7 @@ write_basic_package_version_file(
   ${PROJECT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
   COMPATIBILITY AnyNewerVersion
 )
+
 install(
   FILES
     "${PROJECT_BINARY_DIR}/${CMAKE_FILES_DIRECTORY}/${PROJECT_NAME}Config.cmake"

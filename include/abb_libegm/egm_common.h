@@ -37,7 +37,7 @@
 #ifndef EGM_COMMON_H
 #define EGM_COMMON_H
 
-#include "visibility_control.h"
+#include "abb_libegm_export.h"
 
 namespace abb
 {
@@ -69,7 +69,7 @@ struct Constants
   /**
    * \brief Constants related to the robot controller system.
    */
-  struct ABB_LIBEGM_PUBLIC RobotController
+  struct ABB_LIBEGM_EXPORT RobotController
   {
     /**
      * \brief Lowest sample time [s] used in EGM communication.
@@ -100,7 +100,7 @@ struct Constants
   /**
    * \brief Constants related to the conversions between units.
    */
-  struct ABB_LIBEGM_PUBLIC Conversion
+  struct ABB_LIBEGM_EXPORT Conversion
   {
     /**
      * \brief Conversion value from radians to degrees.
