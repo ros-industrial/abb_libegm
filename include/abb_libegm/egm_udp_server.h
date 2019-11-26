@@ -42,7 +42,7 @@
 namespace abb
 {
 namespace egm
-{ 
+{
 /**
  * \brief Struct for containing data from the UDPServer class.
  */
@@ -120,6 +120,8 @@ public:
 
   /**
    * \brief Checks if the server was successfully initialized or not.
+   *
+   * \return bool indicating if the server has been initialized correctly.
    */
   bool isInitialized() const;
 
@@ -164,7 +166,7 @@ private:
    * \brief A buffer for storing the server's serialized inbound messages (i.e. the robot's outbound messages).
    */
   char receive_buffer_[BUFFER_SIZE];
-  
+
   /**
    * \brief Pointer to an object that is derived from AbstractUDPSeverInterface, which processes the received messages.
    */
