@@ -68,7 +68,7 @@ void EGMControllerInterface::ControllerMotion::writeInputs(const wrapper::Input&
  boost::lock_guard<boost::mutex> lock(read_mutex_);
 
  inputs_.CopyFrom(inputs);
- 
+
  read_data_ready_ = true;
  read_condition_variable_.notify_all();
 }
@@ -164,7 +164,7 @@ const std::string& EGMControllerInterface::callback(const UDPServerData& server_
   if (initializeCallback(server_data))
   {
     // Additional initialization for direct motion references.
-    controller_motion_.initialize(inputs_.first_message());
+    controller_motion_.initialize(inputs_.isFirstMessage());
 
     // Handle demo execution or external controller execution.
     if (configuration_.active.use_demo_outputs)
@@ -173,7 +173,7 @@ const std::string& EGMControllerInterface::callback(const UDPServerData& server_
     }
     else
     {
-      if (inputs_.first_message() || inputs_.states_ok())
+      if (inputs_.isFirstMessage() || inputs_.statesOk())
       {
         // Make the current inputs available (to the external control loop), and notify that it is available.
         controller_motion_.writeInputs(inputs_.current());
