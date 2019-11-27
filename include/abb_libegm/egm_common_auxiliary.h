@@ -157,6 +157,8 @@ void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, c
  * \param current containing for the current joint positions.
  * \param previous containing for the previous joint positions.
  * \param sample_time containing the sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::Joints* p_estimate,
                         const wrapper::Joints& current,
@@ -170,6 +172,8 @@ bool estimateVelocities(wrapper::Joints* p_estimate,
  * \param current containing for the current quaternion.
  * \param previous containing for the previous quaternion.
  * \param sample_time containing the sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::Euler* p_estimate,
                         const wrapper::Quaternion& current,
@@ -183,6 +187,8 @@ bool estimateVelocities(wrapper::Euler* p_estimate,
  * \param current containing for the current Cartesian position and orientation.
  * \param previous containing for the previous Cartesian position and orientation.
  * \param sample_time containing the sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
                         const wrapper::CartesianPose& current,
@@ -194,6 +200,8 @@ bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
  *
  * \param j1 for the first joints object.
  * \param j2 for the second joints object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Joints& j1, const wrapper::Joints& j2);
 
@@ -202,6 +210,8 @@ double findMaxDifference(const wrapper::Joints& j1, const wrapper::Joints& j2);
  *
  * \param c1 for the first Cartesian object.
  * \param c2 for the second Cartesian object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Cartesian& c1, const wrapper::Cartesian& c2);
 
@@ -210,6 +220,8 @@ double findMaxDifference(const wrapper::Cartesian& c1, const wrapper::Cartesian&
  *
  * \param e1 for the first Euler object.
  * \param e2 for the second Euler object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Euler& e1, const wrapper::Euler& e2);
 
@@ -347,7 +359,7 @@ bool parse(wrapper::Joints* p_target_robot,
            const EgmJoints& source_robot,
            const EgmJoints& source_external,
            const RobotAxes axes);
-  
+
 /**
  * \brief Parse an abb::egm::EgmPose object.
  *
