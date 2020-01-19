@@ -47,6 +47,9 @@ namespace egm
  * Class definitions: EGMControllerInterface::ControllerMotion
  */
 
+// See https://stackoverflow.com/questions/16957458/static-const-in-c-class-undefined-reference/16957554
+const unsigned int EGMControllerInterface::ControllerMotion::WRITE_TIMEOUT_MS;
+
 /************************************************************
  * Primary methods
  */
