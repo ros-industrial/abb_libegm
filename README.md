@@ -20,7 +20,7 @@ A C++ library for interfacing with ABB robot controllers supporting *Externally 
 * See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion library that interfaces with *Robot Web Services* (RWS).
 * See StateMachine Add-In ([1.0](https://robotapps.robotstudio.com/#/viewApp/7fa7065f-457f-47ce-98d7-c04882e703ee) or [1.1](https://robotapps.robotstudio.com/#/viewApp/c163de01-792e-4892-a290-37dbe050b6e1)) for an optional *RobotWare Add-In* that can be useful when configuring an ABB robot controller for use with this library.
 
-Please note that this package has not been productized, it is provided "as-is" and only limited support can be provided.
+Please note that this package has not been productized, it is provided "as-is" and only limited support can be expected.
 
 ### Sketch
 
