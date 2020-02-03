@@ -15,7 +15,7 @@ Pull request [#63](https://github.com/ros-industrial/abb_libegm/pull/63) turned 
 
 ## Overview
 
-A C++ library for interfacing with ABB robot controllers supporting *Externally Guided Motion* (EGM). See the *Application manual - Externally Guided Motion* for a detailed description of what EGM is and how to use it.
+A C++ library for interfacing with ABB robot controllers supporting *Externally Guided Motion* (EGM). See the *Application manual - Externally Guided Motion* (document ID: `3HAC073319-001`, revision: `B`) for a detailed description of what EGM is and how to use it.
 
 * See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion library that interfaces with *Robot Web Services* (RWS).
 * See StateMachine Add-In ([1.0](https://robotapps.robotstudio.com/#/viewApp/7fa7065f-457f-47ce-98d7-c04882e703ee) or [1.1](https://robotapps.robotstudio.com/#/viewApp/c163de01-792e-4892-a290-37dbe050b6e1)) for an optional *RobotWare Add-In* that can be useful when configuring an ABB robot controller for use with this library.
