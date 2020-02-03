@@ -4,9 +4,14 @@
 [![license - bsd 3 clause](https://img.shields.io/:license-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![support level: vendor](https://img.shields.io/badge/support%20level-vendor-brightgreen.png)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
-## Important Note
+## Important Notes
 
 RobotWare versions less than `6.07.01` are now incompatible with *abb_libegm* (due to changes in the EGM communication protocol).
+
+Pull request https://github.com/ros-industrial/abb_libegm/pull/63 turned this package from a Catkin package, into a plain CMake package. ROS users can utilize any of the following build tools to build the source code:
+
+* ROS 1: `catkin_make_isolated` or [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/index.html).
+* ROS 2: `colcon`.
 
 ## Overview
 
