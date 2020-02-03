@@ -8,7 +8,7 @@
 
 RobotWare versions less than `6.07.01` are now incompatible with *abb_libegm* (due to changes in the EGM communication protocol).
 
-Pull request [abb_libegm#63](https://github.com/ros-industrial/abb_libegm/pull/63) turned this package from a Catkin package, into a plain CMake package. ROS users can utilize any of the following build tools to build the source code:
+Pull request [abb_libegm#63](https://github.com/ros-industrial/abb_libegm/pull/63) turned this package from a Catkin package into a plain CMake package. ROS users may use any of the following build tools to build the library:
 
 * ROS 1: `catkin_make_isolated` or [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/index.html).
 * ROS 2: [colcon](https://colcon.readthedocs.io/en/released/).
