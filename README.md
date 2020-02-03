@@ -4,16 +4,23 @@
 [![license - bsd 3 clause](https://img.shields.io/:license-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![support level: vendor](https://img.shields.io/badge/support%20level-vendor-brightgreen.png)](http://rosindustrial.org/news/2016/10/7/better-supporting-a-growing-ros-industrial-software-platform)
 
-## Important Note
+## Important Notes
 
 RobotWare versions less than `6.07.01` are now incompatible with *abb_libegm* (due to changes in the EGM communication protocol).
 
+Pull request [abb_libegm#63](https://github.com/ros-industrial/abb_libegm/pull/63) turned this package from a Catkin package into a plain CMake package. ROS users may use any of the following build tools to build the library:
+
+* ROS 1: `catkin_make_isolated` or [catkin_tools](https://catkin-tools.readthedocs.io/en/latest/index.html).
+* ROS 2: [colcon](https://colcon.readthedocs.io/en/released/).
+
 ## Overview
 
-A C++ library for interfacing with ABB robot controllers supporting *Externally Guided Motion* (EGM). See the *Application manual - Controller software IRC5* for a detailed description of what EGM is and how to use it.
+A C++ library for interfacing with ABB robot controllers supporting *Externally Guided Motion* (EGM). See the *Application manual - Externally Guided Motion* (document ID: `3HAC073319-001`, revision: `B`) for a detailed description of what EGM is and how to use it.
 
 * See [abb_librws](https://github.com/ros-industrial/abb_librws) for a companion library that interfaces with *Robot Web Services* (RWS).
-* See [StateMachine Add-In](https://robotapps.robotstudio.com/#/viewApp/7fa7065f-457f-47ce-98d7-c04882e703ee) for an optional *RobotWare Add-In* that can be useful when configuring an ABB robot controller for use with this library.
+* See StateMachine Add-In ([1.0](https://robotapps.robotstudio.com/#/viewApp/7fa7065f-457f-47ce-98d7-c04882e703ee) or [1.1](https://robotapps.robotstudio.com/#/viewApp/c163de01-792e-4892-a290-37dbe050b6e1)) for an optional *RobotWare Add-In* that can be useful when configuring an ABB robot controller for use with this library.
+
+Please note that this package has not been productized, it is provided "as-is" and only limited support can be expected.
 
 ### Sketch
 
@@ -71,11 +78,11 @@ To install the Add-In:
 
 1. Go to the *Add-Ins* tab in RobotStudio.
 2. Search for *StateMachine Add-In* in the *RobotApps* window.
-3. Select the Add-In and retrieve the Add-In by pressing the *Add* button.
+3. Select the desired Add-In version and retrieve it by pressing the *Add* button.
 4. Verify that the Add-In was added to the list *Installed Packages*.
 5. The Add-In should appear as an option during the installation of a RobotWare system.
 
-See the Add-In's [user manual](https://robotapps.blob.core.windows.net/appreferences/docs/2093c0e8-d469-4188-bdd2-ca42e27cba5cUserManual.pdf) for more details, as well as for install instructions for RobotWare systems. The manual can also be accessed by right-clicking on the Add-In in the *Installed Packages* list and selecting *Documentation*.
+See the Add-In's user manual ([1.0](https://robotapps.blob.core.windows.net/appreferences/docs/27e5bd15-b5ec-401d-986a-30c9d2934e97UserManual.pdf) or [1.1](https://robotapps.blob.core.windows.net/appreferences/docs/cd504500-80e2-4cb6-9419-c60ea4ad6d56UserManual.pdf)) for more details, as well as for install instructions for RobotWare systems. The manual can also be accessed by right-clicking on the Add-In in the *Installed Packages* list and selecting *Documentation*.
 
 #### Notes
 
