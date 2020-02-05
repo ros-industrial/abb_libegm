@@ -110,7 +110,7 @@ void EGMBaseInterface::InputContainer::updatePrevious()
   previous_.CopyFrom(current_);
 }
 
-bool EGMBaseInterface::InputContainer::states_ok() const
+bool EGMBaseInterface::InputContainer::statesOk() const
 {
   return (current_.status().motor_state() == wrapper::Status_MotorState_MOTORS_ON &&
           current_.status().rapid_execution_state() == wrapper::Status_RAPIDExecutionState_RAPID_RUNNING &&
@@ -165,7 +165,7 @@ bool EGMBaseInterface::InputContainer::estimateAllVelocities()
                                  previous_.feedback().robot().cartesian().pose(),
                                  estimated_sample_time_);
   }
-  
+
   if (success)
   {
     success = estimateVelocities(current_.mutable_feedback()->mutable_external()->mutable_joints()->mutable_velocity(),
@@ -192,7 +192,7 @@ bool EGMBaseInterface::InputContainer::estimateAllVelocities()
                                  previous_.planned().robot().cartesian().pose(),
                                  estimated_sample_time_);
   }
-  
+
   if (success)
   {
     success = estimateVelocities(current_.mutable_planned()->mutable_external()->mutable_joints()->mutable_velocity(),
@@ -219,9 +219,9 @@ EGMBaseInterface::OutputContainer::OutputContainer() : sequence_number_(0) {}
 
 void EGMBaseInterface::OutputContainer::prepareOutputs(const InputContainer& inputs)
 {
-  sequence_number_ = (inputs.first_message() ? 0 : sequence_number_ + 1);
+  sequence_number_ = (inputs.isFirstMessage() ? 0 : sequence_number_ + 1);
 
-  if (inputs.first_message())
+  if (inputs.isFirstMessage())
   {
     const wrapper::Feedback& feedback = inputs.current().feedback();
     wrapper::Robot* p_robot = current.mutable_robot();
@@ -231,14 +231,14 @@ void EGMBaseInterface::OutputContainer::prepareOutputs(const InputContainer& inp
     p_robot->mutable_joints()->mutable_position()->CopyFrom(feedback.robot().joints().position());
     p_robot->mutable_cartesian()->mutable_pose()->CopyFrom(feedback.robot().cartesian().pose());
     p_external->mutable_joints()->mutable_position()->CopyFrom(feedback.external().joints().position());
-    
+
     // Joint velocities.
     p_robot->mutable_joints()->clear_velocity();
     for (int i = 0; i < feedback.robot().joints().velocity().values_size(); ++i)
     {
       p_robot->mutable_joints()->mutable_velocity()->add_values(0.0);
     }
-    
+
     p_external->mutable_joints()->clear_velocity();
     for (int i = 0; i < feedback.external().joints().velocity().values_size(); ++i)
     {
@@ -260,7 +260,7 @@ void EGMBaseInterface::OutputContainer::prepareOutputs(const InputContainer& inp
 void EGMBaseInterface::OutputContainer::generateDemoOutputs(const InputContainer& inputs)
 {
   unsigned int seqno = sequence_number_;                         // Current sequence number.
-  const double TS = inputs.estimated_sample_time();              // Estimated sample time [s].
+  const double TS = inputs.estimatedSampleTime();                // Estimated sample time [s].
   const double RAMP_IN = 3.0;                                    // Ramp in time [s].
   unsigned int seqno_ramp_in_end = (unsigned int)(RAMP_IN / TS); // Sequence number when the ramp in is finished [-].
 
@@ -351,7 +351,7 @@ void EGMBaseInterface::OutputContainer::constructReply(const BaseConfiguration& 
   {
     success = constructCartesianBody(configuration);
   }
-    
+
   if (success)
   {
     success = egm_sensor_.SerializeToString(&reply_);
@@ -582,7 +582,7 @@ bool EGMBaseInterface::OutputContainer::constructCartesianBody(const BaseConfigu
     // EGM sensor message.
     EgmPlanned* planned = egm_sensor_.mutable_planned();
     planned->clear_cartesian();
-    
+
     if (pose.has_position())
     {
       planned->mutable_cartesian()->mutable_pos()->set_x(pose.position().x());
@@ -596,7 +596,7 @@ bool EGMBaseInterface::OutputContainer::constructCartesianBody(const BaseConfigu
       planned->mutable_cartesian()->mutable_euler()->set_y(pose.euler().y());
       planned->mutable_cartesian()->mutable_euler()->set_z(pose.euler().z());
     }
-    
+
     if (pose.has_quaternion())
     {
       planned->mutable_cartesian()->mutable_orient()->set_u0(pose.quaternion().u0());
@@ -713,7 +713,7 @@ const std::string& EGMBaseInterface::callback(const UDPServerData& server_data)
 
 void EGMBaseInterface::logData(const InputContainer& inputs, const OutputContainer& outputs, const double max_time)
 {
-  if (p_logger_ && p_logger_->calculateTimeLogged(inputs_.estimated_sample_time()) <= max_time)
+  if (p_logger_ && p_logger_->calculateTimeLogged(inputs_.estimatedSampleTime()) <= max_time)
   {
     const wrapper::Feedback& feedback = inputs.current().feedback();
     const wrapper::Planned& planned = inputs.current().planned();
@@ -756,7 +756,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   }
 
   // Update configuration, if requested to do so.
-  if (success && inputs_.first_message())
+  if (success && inputs_.isFirstMessage())
   {
     boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
@@ -767,7 +767,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
     }
   }
 
-  // Extract information from the parsed message. 
+  // Extract information from the parsed message.
   if (success)
   {
     success = inputs_.extractParsedInformation(configuration_.active.axes);
@@ -790,7 +790,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   }
 
   // Prepare the outputs.
-  outputs_.clear_reply();
+  outputs_.clearReply();
   if (success)
   {
     outputs_.prepareOutputs(inputs_);
