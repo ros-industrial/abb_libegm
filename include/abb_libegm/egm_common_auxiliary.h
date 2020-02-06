@@ -204,6 +204,9 @@ bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
 /**
  * \brief Find the maximum difference between two joints objects.
  *
+ * The maximum difference is determined by the absolute difference of each joint pair components.
+ * The number of joints need to be the same, and the components should represent the same robot joints or external axes.
+ *
  * \param j1 for the first joints object.
  * \param j2 for the second joints object.
  *
@@ -214,6 +217,9 @@ double findMaxDifference(const wrapper::Joints& j1, const wrapper::Joints& j2);
 /**
  * \brief Find the maximum difference between two Cartesian objects.
  *
+ * The maximum difference is determined by the absolute difference of each position pair components.
+ * The components should represent the position of the same robot (in the same frame of reference).
+ *
  * \param c1 for the first Cartesian object.
  * \param c2 for the second Cartesian object.
  *
@@ -223,6 +229,9 @@ double findMaxDifference(const wrapper::Cartesian& c1, const wrapper::Cartesian&
 
 /**
  * \brief Find the maximum difference between two Euler objects.
+ *
+ * The maximum difference is determined by the absolute difference of each orientation pair components.
+ * The components should represent the orientation of a robot (in the same frame of reference).
  *
  * \param e1 for the first Euler object.
  * \param e2 for the second Euler object.
