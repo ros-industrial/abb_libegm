@@ -121,7 +121,7 @@ public:
   /**
    * \brief Checks if the server was successfully initialized or not.
    *
-   * \return bool indicating if the server has been initialized correctly.
+   * \return bool true if and only if the server was initialized correctly.
    */
   bool isInitialized() const;
 
