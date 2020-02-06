@@ -153,8 +153,10 @@ void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, c
 /**
  * \brief Estimate joint velocites.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated joint velocities.
- * \param current the current joint positions.
+ * \param current current joint positions.
  * \param previous previous joint positions.
  * \param sample_time current sample time.
  *
@@ -168,10 +170,12 @@ bool estimateVelocities(wrapper::Joints* p_estimate,
 /**
  * \brief Estimate Cartesian angular velocities.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated Cartesian angular velocities.
- * \param current containing for the current quaternion.
- * \param previous containing for the previous quaternion.
- * \param sample_time containing the sample time.
+ * \param current current quaternion.
+ * \param previous previous quaternion.
+ * \param sample_time current the sample time.
  *
  * \return bool indicating if the estimation succeeded.
  */
@@ -183,10 +187,12 @@ bool estimateVelocities(wrapper::Euler* p_estimate,
 /**
  * \brief Estimate Cartesian velocities.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated Cartesian velocities.
- * \param current containing for the current Cartesian position and orientation.
- * \param previous containing for the previous Cartesian position and orientation.
- * \param sample_time containing the sample time.
+ * \param current current Cartesian position and orientation.
+ * \param previous previous Cartesian position and orientation.
+ * \param sample_time current the sample time.
  *
  * \return bool indicating if the estimation succeeded.
  */
