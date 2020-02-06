@@ -156,7 +156,7 @@ void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, c
  * \param p_estimate for containing the estimated joint velocities.
  * \param current the current joint positions.
  * \param previous previous joint positions.
- * \param sample_time containing the sample time.
+ * \param sample_time current sample time.
  *
  * \return bool indicating if the estimation succeeded.
  */
