@@ -18,7 +18,7 @@ package abb.egm.wrapper;
 //======================================================================================================================
 
 message Header
-{ 
+{
   enum MessageType
   {
     UNDEFINED = 0;
@@ -41,7 +41,7 @@ message Status
     EGM_RUNNING   = 3;
   }
 
-  enum MotorState 
+  enum MotorState
   {
     MOTORS_UNDEFINED = 0;
     MOTORS_ON        = 1;
@@ -54,11 +54,12 @@ message Status
     RAPID_STOPPED   = 1;
     RAPID_RUNNING   = 2;
   }
-  
+
   optional bool                egm_convergence_met   = 1;
   optional EGMState            egm_state             = 2 [default = EGM_UNDEFINED];
   optional MotorState          motor_state           = 3 [default = MOTORS_UNDEFINED];
   optional RAPIDExecutionState rapid_execution_state = 4 [default = RAPID_UNDEFINED];
+  optional double              utilization_rate      = 5;
 }
 
 // Note: Time in seconds and microseconds since the epoch (1 Jan 1970)
@@ -74,7 +75,7 @@ message Clock
 //
 //===========================================================
 
-// Note: This message is used for joints values, and only up to seven values will be considered. 
+// Note: This message is used for joints values, and only up to seven values will be considered.
 //
 //       For six axes robots:
 //       - If robot joints   : 1-6 values.
@@ -139,7 +140,7 @@ message CartesianPose
   optional Quaternion quaternion = 3; // Units [-].
 }
 
-message CartesianVelocity 
+message CartesianVelocity
 {
   optional Cartesian linear  = 1; // Units [mm/s].
   optional Euler     angular = 2; // Units [degrees/s].
@@ -171,7 +172,7 @@ message External
 
 // Note: The velocity sub fields are estimated from the actual EGM messages.
 message Feedback
-{  
+{
   optional Robot    robot    = 1;
   optional External external = 2;
   optional Clock    time     = 3;
