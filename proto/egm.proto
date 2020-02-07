@@ -162,6 +162,7 @@ message EgmRobot
     optional EgmTestSignals			testSignals = 7;
     optional EgmRapidCtrlExecState	rapidExecState = 8; 
     optional EgmMeasuredForce		measuredForce = 9;
+    optional double                 utilizationRate=10;
 }
 
 
