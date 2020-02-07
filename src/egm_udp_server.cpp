@@ -105,7 +105,7 @@ void UDPServer::receiveCallback(const boost::system::error_code& error, const st
 {
   server_data_.p_data = receive_buffer_;
   server_data_.bytes_transferred = (int) bytes_transferred;
-  
+
   if (error == boost::system::errc::success && p_interface_)
   {
     // Process the received data via the callback method (creates the reply message).

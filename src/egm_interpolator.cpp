@@ -138,7 +138,7 @@ void EGMInterpolator::SplinePolynomial::update(const SplineConditions& condition
     //---------------------------------------------------------------
     // Calculate the spline polynomial coefficients for:
     // S(t) = A + B*t + C*t^2 + D*t^3
-    // 
+    //
     // Note: Used when ramping down the velocity.
     //       E.g. for stopping use K = 0.0.
     //
@@ -287,7 +287,7 @@ void EGMInterpolator::SplinePolynomial::evaluate(wrapper::trajectory::JointGoal*
   //   S(t) = A + B*t + C*t^2 + D*t^3 + E*t^4 + F*t^5
   //   S_prime(t) = B + 2C*t + 3D*t^2 + 4E*t^3 + 5F*t^4
   //   S_bis(t) = 2C + 6D*t + 12E*t^2 + 20F*t^3
-  // 
+  //
   // Condition: 0 <= t <= T
   //---------------------------------------------------------------
   p_output->mutable_position()->set_values(index, calculatePosition(t));
@@ -304,7 +304,7 @@ void EGMInterpolator::SplinePolynomial::evaluate(wrapper::trajectory::CartesianG
   //   S(t) = A + B*t + C*t^2 + D*t^3 + E*t^4 + F*t^5
   //   S_prime(t) = B + 2C*t + 3D*t^2 + 4E*t^3 + 5F*t^4
   //   S_bis(t) = 2C + 6D*t + 12E*t^2 + 20F*t^3
-  // 
+  //
   // Condition: 0 <= t <= T
   //---------------------------------------------------------------
   switch (axis)
@@ -351,7 +351,7 @@ void EGMInterpolator::Slerp::update(const wrapper::Quaternion& start,
                                     const Conditions& conditions)
 {
   duration_ = conditions.duration;
-  
+
   q0_.CopyFrom(start);
   q1_.CopyFrom(goal);
 
@@ -362,7 +362,7 @@ void EGMInterpolator::Slerp::update(const wrapper::Quaternion& start,
 
   // Check if Slerp or linear interpolation should be used.
   use_linear_ = std::abs(dot_product) > DOT_PRODUCT_THRESHOLD;
-  
+
   if (!use_linear_)
   {
     // Reverse one of the quaternions, if the dot product is negative.
@@ -469,7 +469,7 @@ void EGMInterpolator::SoftRamp::update(const wrapper::trajectory::PointGoal& sta
       start_angular_velocity_.CopyFrom(start.robot().cartesian().pose().euler());
     }
     break;
-    
+
     case RampInPosition:
     case RampInVelocity:
     {
@@ -498,7 +498,7 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::JointGoal* p_outpu
       // Ramp factor that goes from 0.0 to 1.0 and its derivate.
       ramp_factor = 0.5*std::cos(M_PI*t + M_PI) + 0.5;
       d_ramp_factor = -0.5*M_PI / duration_*std::sin(M_PI*t + M_PI);
-      
+
       // Output to set.
       wrapper::Joints* p_p = p_output->mutable_position();
       wrapper::Joints* p_v = p_output->mutable_velocity();
@@ -523,9 +523,9 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::JointGoal* p_outpu
 
     case RampInVelocity:
     {
-      // Ramp factor that goes from 0.0 to 1.0. 
+      // Ramp factor that goes from 0.0 to 1.0.
       ramp_factor = 0.5*std::cos(M_PI*t + M_PI) + 0.5;
-      
+
       // Output to set.
       wrapper::Joints* p_p = p_output->mutable_position();
       wrapper::Joints* p_v = p_output->mutable_velocity();
@@ -572,16 +572,16 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::CartesianGoal* p_o
 
       // Ramp factor that goes from 1.0 to 0.0.
       ramp_factor = 0.5*std::cos(M_PI*t) + 0.5;
-      
+
       // Calculate the angular velocity output.
       p_av->set_x(ramp_factor*start_angular_velocity_.x());
       p_av->set_y(ramp_factor*start_angular_velocity_.y());
       p_av->set_z(ramp_factor*start_angular_velocity_.z());
-      
+
       // Calculate the quaternion derivate. Note: p_output contain the previously calculated quaternion.
       wrapper::Quaternion d_q;
       convert(&d_q, p_output->mutable_pose()->quaternion(), *p_av);
-      
+
       // Calculate the quaternion output.
       p_q->set_u0(p_q->u0() + sample_time*d_q.u0());
       p_q->set_u1(p_q->u1() + sample_time*d_q.u1());
@@ -590,7 +590,7 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::CartesianGoal* p_o
       normalize(p_q);
     }
     break;
-    
+
     case RampInPosition:
     {
       // Output to set. Note: The Euler field is internally used to contain angular velocities.
@@ -600,7 +600,7 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::CartesianGoal* p_o
       wrapper::Quaternion* p_q = p_output->mutable_pose()->mutable_quaternion();
       wrapper::Euler* p_av = p_output->mutable_pose()->mutable_euler();
 
-      // Ramp factor that goes from 0.0 to 1.0 and its derivate. 
+      // Ramp factor that goes from 0.0 to 1.0 and its derivate.
       ramp_factor = 0.5*std::cos(M_PI*t + M_PI) + 0.5;
       d_ramp_factor = -0.5*M_PI / duration_*std::sin(M_PI*t + M_PI);
 
@@ -641,7 +641,7 @@ void EGMInterpolator::SoftRamp::evaluate(wrapper::trajectory::CartesianGoal* p_o
       wrapper::Quaternion* p_q = p_output->mutable_pose()->mutable_quaternion();
       wrapper::Euler* p_av = p_output->mutable_pose()->mutable_euler();
 
-      // Ramp factor that goes from 0.0 to 1.0. 
+      // Ramp factor that goes from 0.0 to 1.0.
       ramp_factor = 0.5*std::cos(M_PI*t + M_PI) + 0.5;
 
       const wrapper::Cartesian& start_v = start_.robot().cartesian().velocity();
@@ -697,7 +697,7 @@ void EGMInterpolator::update(const wrapper::trajectory::PointGoal& start,
 {
   conditions_ = conditions;
   conditions_.duration = std::max(Constants::RobotController::LOWEST_SAMPLE_TIME, conditions_.duration);
-  
+
   switch (conditions_.operation)
   {
     case Normal:
@@ -746,7 +746,7 @@ void EGMInterpolator::update(const wrapper::trajectory::PointGoal& start,
           {
             soft_ramp_.update(start, goal, conditions);
           }
-  
+
           // External joints.
           for (int i = 0; i < start.external().joints().position().values_size() && i < spline_polynomials_.size(); ++i)
           {
@@ -813,7 +813,7 @@ void EGMInterpolator::evaluate(wrapper::trajectory::PointGoal* p_output, const d
           {
             soft_ramp_.evaluate(p_output->mutable_robot()->mutable_cartesian(), sample_time, t);
           }
-          
+
           // External joints.
           for (int i = 0;
                i < p_output->external().joints().position().values_size() && i < spline_polynomials_.size(); ++i)
