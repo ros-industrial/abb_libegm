@@ -218,7 +218,7 @@ double findMaxDifference(const wrapper::Joints& j1, const wrapper::Joints& j2);
 /**
  * \brief Find the maximum difference between two Cartesian objects.
  *
- * The maximum difference is determined by the absolute difference of each position pair components.
+ * The maximum difference is determined by the absolute difference for each position pair.
  * The components should represent the position of the same robot (in the same frame of reference).
  *
  * \param c1 for the first Cartesian object.
@@ -231,7 +231,7 @@ double findMaxDifference(const wrapper::Cartesian& c1, const wrapper::Cartesian&
 /**
  * \brief Find the maximum difference between two Euler objects.
  *
- * The maximum difference is determined by the absolute difference of each orientation pair components.
+ * The maximum difference is determined by the absolute difference for each orientation pair.
  * The components should represent the orientation of a robot (in the same frame of reference).
  *
  * \param e1 for the first Euler object.
