@@ -153,10 +153,14 @@ void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, c
 /**
  * \brief Estimate joint velocites.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated joint velocities.
- * \param current containing for the current joint positions.
- * \param previous containing for the previous joint positions.
- * \param sample_time containing the sample time.
+ * \param current current joint positions.
+ * \param previous previous joint positions.
+ * \param sample_time current sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::Joints* p_estimate,
                         const wrapper::Joints& current,
@@ -166,10 +170,14 @@ bool estimateVelocities(wrapper::Joints* p_estimate,
 /**
  * \brief Estimate Cartesian angular velocities.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated Cartesian angular velocities.
- * \param current containing for the current quaternion.
- * \param previous containing for the previous quaternion.
- * \param sample_time containing the sample time.
+ * \param current current quaternion.
+ * \param previous previous quaternion.
+ * \param sample_time current the sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::Euler* p_estimate,
                         const wrapper::Quaternion& current,
@@ -179,10 +187,14 @@ bool estimateVelocities(wrapper::Euler* p_estimate,
 /**
  * \brief Estimate Cartesian velocities.
  *
+ * The estimation will fail if the sample time is less than or equal to zero.
+ *
  * \param p_estimate for containing the estimated Cartesian velocities.
- * \param current containing for the current Cartesian position and orientation.
- * \param previous containing for the previous Cartesian position and orientation.
- * \param sample_time containing the sample time.
+ * \param current current Cartesian position and orientation.
+ * \param previous previous Cartesian position and orientation.
+ * \param sample_time current the sample time.
+ *
+ * \return bool indicating if the estimation succeeded.
  */
 bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
                         const wrapper::CartesianPose& current,
@@ -192,24 +204,40 @@ bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
 /**
  * \brief Find the maximum difference between two joints objects.
  *
+ * The maximum difference is determined by the absolute difference for each joint pair.
+ * The number of joints therefore needs to be the same, and the components should represent
+ * the same robot joints or external axes.
+ *
  * \param j1 for the first joints object.
  * \param j2 for the second joints object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Joints& j1, const wrapper::Joints& j2);
 
 /**
  * \brief Find the maximum difference between two Cartesian objects.
  *
+ * The maximum difference is determined by the absolute difference for each position pair.
+ * The components should represent the position of the same robot (in the same frame of reference).
+ *
  * \param c1 for the first Cartesian object.
  * \param c2 for the second Cartesian object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Cartesian& c1, const wrapper::Cartesian& c2);
 
 /**
  * \brief Find the maximum difference between two Euler objects.
  *
+ * The maximum difference is determined by the absolute difference for each orientation pair.
+ * The components should represent the orientation of a robot (in the same frame of reference).
+ *
  * \param e1 for the first Euler object.
  * \param e2 for the second Euler object.
+ *
+ * \return double with the maximum difference.
  */
 double findMaxDifference(const wrapper::Euler& e1, const wrapper::Euler& e2);
 
@@ -347,7 +375,7 @@ bool parse(wrapper::Joints* p_target_robot,
            const EgmJoints& source_robot,
            const EgmJoints& source_external,
            const RobotAxes axes);
-  
+
 /**
  * \brief Parse an abb::egm::EgmPose object.
  *
