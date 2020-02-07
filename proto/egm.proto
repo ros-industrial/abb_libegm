@@ -3,10 +3,11 @@
 // messages of type EgmRobot are sent out from the robot controller
 // messages of type EgmSensor are sent to the robot controller
 //
+syntax = "proto2";
 package abb.egm;
 
 message EgmHeader
-{ 
+{
     optional uint32 seqno = 1; // sequence number (to be able to find lost messages)
     optional uint32 tm = 2;    // controller send time stamp in ms
 
@@ -53,11 +54,11 @@ message EgmClock				// Time in seconds and microseconds since 1 Jan 1970
 }
 
 message EgmPose					// Pose (i.e. cartesian position and Quaternion orientation) relative to the correction frame defined by EGMActPose
-{ 
+{
     optional EgmCartesian	pos = 1;
     optional EgmQuaternion	orient = 2;
 	optional EgmEuler		euler = 3;
-} 
+}
 
 message EgmCartesianSpeed 		// Array of 6 speed reference values in mm/s or degrees/s
 {
@@ -160,7 +161,7 @@ message EgmRobot
     optional EgmMCIState			mciState = 5;
     optional bool					mciConvergenceMet = 6;
     optional EgmTestSignals			testSignals = 7;
-    optional EgmRapidCtrlExecState	rapidExecState = 8; 
+    optional EgmRapidCtrlExecState	rapidExecState = 8;
     optional EgmMeasuredForce		measuredForce = 9;
     optional double                 utilizationRate=10;
 }
