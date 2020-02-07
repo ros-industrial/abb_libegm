@@ -58,12 +58,12 @@ public:
    * \param use_default_header specifying if the default headers should be used in the log.
    */
   EGMLogger(const std::string& filename, const bool use_default_headers = true);
-  
+
   /**
    * \brief A destructor.
    */
   ~EGMLogger();
-    
+
   /**
    * \brief Flush the stream object.
    */
@@ -90,7 +90,7 @@ public:
    * \param pose containing the pose data to add.
    */
   void add(const wrapper::CartesianPose& pose);
-  
+
   /**
    * \brief Add Cartesian velocity data to the log stream.
    *
@@ -98,7 +98,7 @@ public:
    * \param last indicating if it is the last addition to current the log event.
    */
   void add(const wrapper::CartesianVelocity& velocity, const bool last = false);
-  
+
   /**
    * \brief Calculate the amount of time logged.
    *

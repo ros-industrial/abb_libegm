@@ -91,12 +91,12 @@ number_of_logged_messages_(0)
        << "S_REF_QUAT_U0,S_REF_QUAT_U1,S_REF_QUAT_U2,S_REF_QUAT_U3,"
        << "S_REF_VEL_LX,S_REF_VEL_LY,S_REF_VEL_LZ,"
        << "S_REF_VEL_AX,S_REF_VEL_AY,S_REF_VEL_AZ\n";
-    
+
     log_stream_ << ss.str();
     log_stream_.flush();
   }
 }
-  
+
 EGMLogger::~EGMLogger()
 {
   log_stream_.close();

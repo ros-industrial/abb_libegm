@@ -105,7 +105,7 @@ wrapper::Quaternion multiply(const wrapper::Quaternion& q1, const wrapper::Quate
   result.set_u1(q1.u0()*q2.u1() + q1.u1()*q2.u0() + q1.u2()*q2.u3() - q1.u3()*q2.u2());
   result.set_u2(q1.u0()*q2.u2() + q1.u2()*q2.u0() + q1.u3()*q2.u1() - q1.u1()*q2.u3());
   result.set_u3(q1.u0()*q2.u3() + q1.u3()*q2.u0() + q1.u1()*q2.u2() - q1.u2()*q2.u1());
-  
+
   return result;
 }
 
@@ -232,7 +232,7 @@ void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, c
 /***********************************************************************************************************************
  * Estimation functions
  */
- 
+
 bool estimateVelocities(wrapper::Joints* p_estimate,
                         const wrapper::Joints& current,
                         const wrapper::Joints& previous,
@@ -244,7 +244,7 @@ bool estimateVelocities(wrapper::Joints* p_estimate,
   if (p_estimate && sample_time > 0.0)
   {
     p_estimate->Clear();
-    
+
     for (int i = 0; i < current.values_size() && i < previous.values_size(); ++i)
     {
       delta_speed = current.values(i) - previous.values(i);
@@ -271,7 +271,7 @@ bool estimateVelocities(wrapper::Euler* p_estimate,
     // Also assumes constant angular velocity between the points.
     boost::math::quaternion<double> q1(previous.u0(), previous.u1(),
                                        previous.u2(), previous.u3());
-    
+
     boost::math::quaternion<double> q2(current.u0(), current.u1(),
                                        current.u2(), current.u3());
 
@@ -624,7 +624,7 @@ bool parse(wrapper::Status* p_target, const EgmRobot& source)
         p_target->set_motor_state(wrapper::Status_MotorState_MOTORS_UNDEFINED);
       }
     }
-    
+
     switch (source.mcistate().state())
     {
       case EgmMCIState_MCIStateType_MCI_UNDEFINED:
@@ -676,13 +676,13 @@ bool parse(wrapper::Status* p_target, const EgmRobot& source)
         p_target->set_rapid_execution_state(wrapper::Status_RAPIDExecutionState_RAPID_RUNNING);
       }
       break;
-      
+
       default:
       {
         p_target->set_rapid_execution_state(wrapper::Status_RAPIDExecutionState_RAPID_UNDEFINED);
       }
     }
-  
+
     p_target->set_egm_convergence_met(source.mciconvergencemet());
 
     success = true;
@@ -778,7 +778,7 @@ bool parse(wrapper::CartesianPose* p_target, const EgmPose& source)
   if (p_target)
   {
     p_target->Clear();
-    
+
     if (source.has_pos() && source.pos().has_x() && source.pos().has_y() && source.pos().has_z())
     {
       p_target->mutable_position()->set_x(source.pos().x());
@@ -850,7 +850,7 @@ bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAx
 }
 
 bool parse(wrapper::Planned* p_target, const EgmPlanned& source, const RobotAxes axes)
-{ 
+{
   bool success = false;
 
   if (p_target)

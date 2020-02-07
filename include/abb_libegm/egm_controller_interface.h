@@ -79,14 +79,14 @@ public:
    * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occured.
    */
   bool waitForMessage(const unsigned int timeout_ms = 0);
-  
+
   /**
    * \brief Read EGM inputs received from the robot controller.
    *
    * \param p_inputs for containing the inputs.
    */
   void read(wrapper::Input* p_inputs);
-  
+
   /**
    * \brief Write EGM outputs to send to the robot controller.
    *
@@ -112,7 +112,7 @@ private:
      * \param first_message indicating if it is the first message in a communication session.
      */
     void initialize(const bool first_message);
-    
+
     /**
      * \brief Wait for the next message.
      *
@@ -121,7 +121,7 @@ private:
      * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occured.
      */
     bool waitForMessage(const unsigned int timeout_ms);
-    
+
     /**
      * \brief Write the current inputs (from the inner loop, to the intermediate storage).
      *
@@ -135,14 +135,14 @@ private:
      * \param p_inputs for containing the inputs.
      */
     void readInputs(wrapper::Input* p_inputs);
-    
+
     /**
      * \brief Write the current outputs (from the external loop, to the intermediate storage).
      *
      * \param outputs for containing the outputs.
      */
     void writeOutputs(const wrapper::Output& outputs);
-    
+
     /**
      * \brief Read the current outputs (from the intermediate storage, to the inner loop).
      *
@@ -165,12 +165,12 @@ private:
      * \brief Mutex for protecting write data.
      */
     boost::mutex write_mutex_;
-    
+
     /**
      * \brief Condition variable for waiting on read data.
      */
     boost::condition_variable read_condition_variable_;
-    
+
     /**
      * \brief Condition variable for waiting on write data.
      */
@@ -185,7 +185,7 @@ private:
      * \brief Flag indicating if write data is ready.
      */
     bool write_data_ready_;
-    
+
     /**
      * \brief Container for the inputs received from the robot controller.
      */
@@ -196,7 +196,7 @@ private:
      */
     wrapper::Output outputs_;
   };
-  
+
   /**
    * \brief Handle callback requests from an UDP server.
    *
@@ -205,7 +205,7 @@ private:
    * \return string& containing the reply.
    */
   const std::string& callback(const UDPServerData& server_data);
-  
+
   /**
    * \brief The interface's controller motion data (between internal loop and external controller loop).
    */

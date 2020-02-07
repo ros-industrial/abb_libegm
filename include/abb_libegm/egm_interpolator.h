@@ -53,7 +53,7 @@ namespace egm
  * The used approaches, depending on the conditions, are:
  * - 5th (or lower) degree spline polynomials.
  * - Slerp interpolation.
- * - Ramping in or ramping down values.  
+ * - Ramping in or ramping down values.
  *
  * Warning: No kinematics are considered. I.e. joint limits can be exceeded (which can be a problem).
  */
@@ -70,7 +70,7 @@ public:
     RampInPosition, ///< Ramp in position operation, i.e. used for static goals.
     RampInVelocity  ///< Ramp in velocity operation, i.e. used for static goals.
   };
-  
+
   /**
    * \brief Struct for containing conditions for the interpolator.
    */
@@ -92,7 +92,7 @@ public:
      * \brief Duration [s] of the interpolation session.
      */
     double duration;
-    
+
     /**
      * \brief The active EGM mode.
      */
@@ -109,16 +109,16 @@ public:
      * Note: The value should be between 0.0 and 1.0.
      */
     double ramp_down_factor;
-    
+
     /**
      * \brief The spline method to use for normal operation.
      */
     TrajectoryConfiguration::SplineMethod spline_method;
   };
-  
+
   /**
    * \brief Update the interpolator for upcoming calculations. E.g. used after a new goal has been chosen.
-   * 
+   *
    * \param start containing the start point.
    * \param goal containing the goal point.
    * \param conditions for specifying conditions for the interpolator.
@@ -126,19 +126,19 @@ public:
   void update(const wrapper::trajectory::PointGoal& start,
               const wrapper::trajectory::PointGoal& goal,
               const Conditions& conditions);
-  
+
   /**
    * \brief Evaluate the interpolator at a specific time instance.
-   * 
+   *
    * \param p_output for storing the evaluated output.
    * \param sample_time specifying the used sample time [s].
    * \param t for the time instance [s] that the interpolation should be calculated at.
    */
   void evaluate(wrapper::trajectory::PointGoal* p_output, const double sample_time, double t);
-  
+
   /**
    * \brief Retrive the valid duration [s] for the current interpolation session.
-   * 
+   *
    * \return double containing the duration.
    */
   double getDuration()
@@ -156,12 +156,12 @@ private:
     Y, ///< Cartesian y axis.
     Z  ///< Cartesian z axis.
   };
-  
+
   /**
    * \brief Class for containing conditions for a spline polynomial.
    */
   class SplineConditions
-  { 
+  {
   public:
     /**
      * \brief A constructor.
@@ -203,7 +203,7 @@ private:
     void setConditions(const Axis axis,
                        const wrapper::trajectory::CartesianGoal& start,
                        const wrapper::trajectory::CartesianGoal& goal);
-    
+
     /**
      * \brief Duration of the interpolation.
      */
@@ -238,17 +238,17 @@ private:
      * \param The goal acceleration.
      */
     double dd_beta;
-    
+
     /**
      * \brief Specifies which spline method to use.
      */
     TrajectoryConfiguration::SplineMethod spline_method;
-    
+
     /**
      * \brief Flag indicating if ramp down interpolation should be performed or not.
      */
     bool do_ramp_down;
-    
+
     /**
      * \brief Value specifying the factor, of the current velocity, to use as end velocity for ramp down calculations.
      *
@@ -259,7 +259,7 @@ private:
 
   /**
    * \brief Class for a spline interpolation polynomial of degree 5 or lower.
-   * 
+   *
    * I.e. A + B*t + C*t^2 + D*t^3 + E*t^4 + F*t^5.
    */
   class SplinePolynomial
@@ -365,7 +365,7 @@ private:
 
   /**
    * \brief Class for Slerp (Spherical linear interpolation) for quaternions.
-   *        Slerp with unit quaternions produce a roataion with uniform angular speed. 
+   *        Slerp with unit quaternions produce a roataion with uniform angular speed.
    *
    * I.e. Slerp(q0, q1; t) = [sin((1-t)*omega)/sin(omega)]*q0 + [sin(t*omega)/sin(omega)]*q1.
    *      Where q0 and q1 are quaternions and cos(omega) = q0*q1 (dot product).
@@ -390,7 +390,7 @@ private:
       q0_.set_u0(1.0);
       q1_.set_u0(1.0);
     }
-    
+
     /**
      * \brief Update the Slerp's coefficient.
      *
@@ -417,7 +417,7 @@ private:
      * Note: That is if the quaternions are too close to each other.
      */
     const double DOT_PRODUCT_THRESHOLD;
-    
+
     /**
      * \brief Duration [s] of the interpolation session.
      */
@@ -443,7 +443,7 @@ private:
      */
     bool use_linear_;
   };
-  
+
   /**
    * \brief Class for ramping in positions or velocities. As well as ramping down angular velocities.
    *
@@ -484,7 +484,7 @@ private:
                   const bool robot,
                   const double sample_time,
                   double t);
-    
+
     /**
      * \brief Evaluate the ramp, for Cartesian values.
      *
@@ -499,7 +499,7 @@ private:
      * \brief Duration [s] of the interpolation session.
      */
     double duration_;
-    
+
     /**
      * \brief The requested interpolation operation.
      */
@@ -509,7 +509,7 @@ private:
      * \brief A container for the start point.
      */
     wrapper::trajectory::PointGoal start_;
-    
+
     /**
      * \brief A container for the starting angular velocity values.
      */
@@ -525,12 +525,12 @@ private:
    * \brief Static constant for the max number of spline polynomials.
    */
   static const size_t MAX_NUMBER_OF_SPLINES_ = 12;
-  
+
   /**
    * \brief Offset in the spline polynomial array, to the external joint elements.
    */
   int offset_;
-  
+
   /**
    * \brief Container for the spline interpolation polynomials.
    */
@@ -540,7 +540,7 @@ private:
    * \brief Container for the Slerp (for interpolating quaterions).
    */
   Slerp slerp_;
-  
+
   /**
    * \brief Container for ramping in positions or velocities. As well as ramping down angular velocities.
    */
