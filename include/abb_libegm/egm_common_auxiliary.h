@@ -204,7 +204,7 @@ bool estimateVelocities(wrapper::CartesianVelocity* p_estimate,
 /**
  * \brief Find the maximum difference between two joints objects.
  *
- * The maximum difference is determined by the absolute difference of each joint pair components.
+ * The maximum difference is determined by the absolute difference for each joint pair.
  * The number of joints need to be the same, and the components should represent the same robot joints or external axes.
  *
  * \param j1 for the first joints object.
