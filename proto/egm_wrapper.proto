@@ -43,6 +43,8 @@ message Header
   optional uint32      sequence_number = 1; // Sequence number (to be able to detect lost messages).
   optional uint32      time_stamp      = 2; // Time stamp in milliseconds.
   optional MessageType message_type    = 3 [default = UNDEFINED];
+  optional RWVersion   rw_version      = 4 [default = RW_UNKNOWN];
+  optional EGMVersion  egm_version     = 5 [default = EGM_UNKNOWN];
 }
 
 // Note: Status of the robot controller, and the active EGM motion.
