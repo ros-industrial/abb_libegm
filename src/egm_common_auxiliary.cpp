@@ -685,6 +685,11 @@ bool parse(wrapper::Status* p_target, const EgmRobot& source)
 
     p_target->set_egm_convergence_met(source.mciconvergencemet());
 
+    if(source.has_utilizationrate())
+    {
+      p_target->set_utilization_rate(source.utilizationrate());
+    }
+
     success = true;
   }
 
