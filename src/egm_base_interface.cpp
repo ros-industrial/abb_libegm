@@ -84,6 +84,8 @@ bool EGMBaseInterface::InputContainer::extractParsedInformation(const RobotAxes&
 {
   bool success = false;
 
+  detectRWAndEGMVersions();
+
   if (has_new_data_ &&
       parse(current_.mutable_header(), egm_robot_.header()) &&
       parse(current_.mutable_feedback(), egm_robot_.feedback(), axes) &&
@@ -120,6 +122,35 @@ bool EGMBaseInterface::InputContainer::statesOk() const
 /************************************************************
  * Auxiliary methods
  */
+
+void EGMBaseInterface::InputContainer::detectRWAndEGMVersions()
+{
+  if(has_new_data_)
+  {
+    if(egm_robot_.feedback().has_time())
+    {
+      if(egm_robot_.has_utilizationrate())
+      {
+        current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_LATER);
+      }
+      else
+      {
+        current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_BETWEEN_6_07_AND_6_09_02);
+      }
+      current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_1_1);
+    }
+    else
+    {
+      current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_BETWEEN_6_AND_6_06_03);
+      current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_1_0);
+    }
+  }
+  else
+  {
+    current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_UNKNOWN);
+    current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_UNKNOWN);
+  }
+}
 
 double EGMBaseInterface::InputContainer::estimateSampleTime()
 {

@@ -197,6 +197,11 @@ protected:
 
   private:
     /**
+     * \brief Detect RobotWare and EGM protocol versions from a received EGM message.
+     */
+    void detectRWAndEGMVersions();
+
+    /**
      * \brief Estimate the sample time.
      *
      * \return double containing the estimation.
