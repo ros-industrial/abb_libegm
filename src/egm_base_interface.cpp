@@ -131,7 +131,7 @@ void EGMBaseInterface::InputContainer::detectRWAndEGMVersions()
     {
       if(egm_robot_.has_utilizationrate())
       {
-        current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_LATER);
+        current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_6_10_AND_NEWER);
       }
       else
       {
