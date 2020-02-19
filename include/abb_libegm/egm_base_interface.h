@@ -198,6 +198,8 @@ protected:
   private:
     /**
      * \brief Detect RobotWare and EGM protocol versions from a received EGM message.
+     *
+     * Note: Only a rough version detection is possible based on if certain fields are present or not.
      */
     void detectRWAndEGMVersions();
 
