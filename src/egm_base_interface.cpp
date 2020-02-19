@@ -127,20 +127,33 @@ void EGMBaseInterface::InputContainer::detectRWAndEGMVersions()
 {
   if(has_new_data_)
   {
+    // Time field was added in RobotWare '6.07', as well as fix of inconsistent units (e.g. radians and degrees).
     if(egm_robot_.feedback().has_time())
     {
+      // If time field present:
+      // - RW greater than or equal to '6.07'.
+      // - EGM protocol '1.1' (with consistent units).
+      current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_1_1);
+
+      // Utilization field was added in RobotWare '6.10'.
       if(egm_robot_.has_utilizationrate())
       {
+        // If utilization field present:
+        // - RW greater than or equal to '6.10'.
         current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_6_10_AND_NEWER);
       }
       else
       {
+        // If utilization field absent:
+        // - RW between '6.07' and '6.09.02'.
         current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_BETWEEN_6_07_AND_6_09_02);
       }
-      current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_1_1);
     }
     else
     {
+      // If time field absent:
+      // - RW between '6.0' and '6.06.03'.
+      // - EGM protocol '1.0' (with inconsistent units).
       current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_BETWEEN_6_AND_6_06_03);
       current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_1_0);
     }
