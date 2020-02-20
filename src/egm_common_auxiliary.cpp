@@ -855,7 +855,14 @@ bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAx
 
     if (success)
     {
-      success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      if(axes == None)
+      {
+        success = !source.has_cartesian();
+      }
+      else
+      {
+        success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      }
 
       if (success)
       {
@@ -879,7 +886,14 @@ bool parse(wrapper::Planned* p_target, const EgmPlanned& source, const RobotAxes
 
     if (success)
     {
-      success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      if(axes == None)
+      {
+        success = !source.has_cartesian();
+      }
+      else
+      {
+        success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      }
 
       if (success)
       {
