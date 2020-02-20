@@ -515,6 +515,20 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
 
     switch (configuration.axes)
     {
+      case None:
+      {
+        if (robot_position.values_size() == 0)
+        {
+          for (int i = 0; i < external_position.values_size() && i < ext_condition; ++i)
+          {
+            planned->mutable_externaljoints()->add_joints(external_position.values(i));
+          }
+
+          position_ok = true;
+        }
+      }
+      break;
+
       case Six:
       {
         if (robot_position.values_size() == rob_condition)
