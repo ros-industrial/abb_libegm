@@ -728,6 +728,19 @@ bool parse(wrapper::Joints* p_target_robot,
 
     switch (axes)
     {
+      case None:
+      {
+        if (source_robot.joints_size() == 0)
+        {
+          for (int i = 0; i < source_external.joints_size(); ++i)
+          {
+            p_target_external->add_values(source_external.joints(i));
+          }
+
+          success = true;
+        }
+      }
+
       case Six:
       {
         if (source_robot.joints_size() == Constants::RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS)
