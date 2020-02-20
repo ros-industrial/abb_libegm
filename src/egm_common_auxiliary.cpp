@@ -740,6 +740,7 @@ bool parse(wrapper::Joints* p_target_robot,
           success = true;
         }
       }
+      break;
 
       case Six:
       {
