@@ -391,7 +391,7 @@ void EGMBaseInterface::OutputContainer::constructReply(const BaseConfiguration& 
   constructHeader();
   bool success = constructJointBody(configuration);
 
-  if (success)
+  if (success && configuration.axes != None)
   {
     success = constructCartesianBody(configuration);
   }
