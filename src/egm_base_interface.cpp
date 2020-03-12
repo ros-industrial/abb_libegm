@@ -502,6 +502,12 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
     const wrapper::Joints& robot_position = current.robot().joints().position();
     const wrapper::Joints& external_position = current.external().joints().position();
 
+    // Verify that there are no NaN or infinity values.
+    if(!verify(robot_position) || !verify(external_position))
+    {
+      return false;
+    }
+
     // EGM sensor message.
     EgmPlanned* planned = egm_sensor_.mutable_planned();
     planned->clear_joints();
@@ -558,6 +564,12 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
     // Outputs.
     const wrapper::Joints& robot_velocity = current.robot().joints().velocity();
     const wrapper::Joints& external_velocity = current.external().joints().velocity();
+
+    // Verify that there are no NaN or infinity values.
+    if(!verify(robot_velocity) || !verify(external_velocity))
+    {
+      return false;
+    }
 
     // EGM sensor message.
     EgmSpeedRef* speed_reference = egm_sensor_.mutable_speedref();
@@ -623,6 +635,12 @@ bool EGMBaseInterface::OutputContainer::constructCartesianBody(const BaseConfigu
     // Outputs.
     const wrapper::CartesianPose& pose = current.robot().cartesian().pose();;
 
+    // Verify that there are no NaN or infinity values.
+    if(!verify(pose))
+    {
+      return false;
+    }
+
     // EGM sensor message.
     EgmPlanned* planned = egm_sensor_.mutable_planned();
     planned->clear_cartesian();
@@ -656,6 +674,12 @@ bool EGMBaseInterface::OutputContainer::constructCartesianBody(const BaseConfigu
   {
     // References.
     const wrapper::CartesianVelocity& velocity = current.robot().cartesian().velocity();
+
+    // Verify that there are no NaN or infinity values.
+    if(!verify(velocity))
+    {
+      return false;
+    }
 
     // EGM sensor message.
     EgmSpeedRef* speed_reference = egm_sensor_.mutable_speedref();

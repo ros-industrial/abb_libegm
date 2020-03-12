@@ -430,6 +430,69 @@ void reset(wrapper::Cartesian* p_cartesian);
  */
 void reset(wrapper::Euler* p_euler);
 
+/**
+ * \brief Verify that a double value is neither NaN nor infinity.
+ *
+ * \param value to check.
+ *
+ * \return bool true if the value is ok.
+ */
+bool verify(const double value);
+
+/**
+ * \brief Verify that a joints object contain neither NaN nor infinity values.
+ *
+ * \param joints to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::Joints& joints);
+
+/**
+ * \brief Verify that a Cartesian object contain neither NaN nor infinity values.
+ *
+ * \param cartesian to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::Cartesian& cartesian);
+
+/**
+ * \brief Verify that a Euler object contain neither NaN nor infinity values.
+ *
+ * \param euler to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::Euler& euler);
+
+/**
+ * \brief Verify that a quaternion object contain neither NaN nor infinity values.
+ *
+ * \param quaternion to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::Quaternion& quaternion);
+
+/**
+ * \brief Verify that a Cartesian pose object contain neither NaN nor infinity values.
+ *
+ * \param pose to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::CartesianPose& pose);
+
+/**
+ * \brief Verify that a Cartesian velocity object contain neither NaN nor infinity values.
+ *
+ * \param velocity to check.
+ *
+ * \return bool true if the values are ok.
+ */
+bool verify(const wrapper::CartesianVelocity& velocity);
+
 } // end namespace egm
 } // end namespace abb
 

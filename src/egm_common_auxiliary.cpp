@@ -918,5 +918,90 @@ void reset(wrapper::Euler* p_euler)
   }
 }
 
+
+
+
+/***********************************************************************************************************************
+ * Verify functions
+ */
+
+bool verify(const double value)
+{
+  return !std::isnan(value) && !std::isinf(value);
+}
+
+bool verify(const wrapper::Joints& joints)
+{
+  for (int i = 0; i < joints.values_size(); ++i)
+  {
+    if(!verify(joints.values(i)))
+    {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+bool verify(const wrapper::Cartesian& cartesian)
+{
+  if((cartesian.has_x() && !verify(cartesian.x())) ||
+     (cartesian.has_y() && !verify(cartesian.y())) ||
+     (cartesian.has_z() && !verify(cartesian.z())))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool verify(const wrapper::Euler& euler)
+{
+  if((euler.has_x() && !verify(euler.x())) ||
+     (euler.has_y() && !verify(euler.y())) ||
+     (euler.has_z() && !verify(euler.z())))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool verify(const wrapper::Quaternion& quaternion)
+{
+  if((quaternion.has_u0() && !verify(quaternion.u0())) ||
+     (quaternion.has_u1() && !verify(quaternion.u1())) ||
+     (quaternion.has_u2() && !verify(quaternion.u2())) ||
+     (quaternion.has_u3() && !verify(quaternion.u3())))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool verify(const wrapper::CartesianPose& pose)
+{
+  if((pose.has_position() && !verify(pose.position())) ||
+     (pose.has_euler() && !verify(pose.euler())) ||
+     (pose.has_quaternion() && !verify(pose.quaternion())))
+  {
+    return false;
+  }
+
+  return true;
+}
+
+bool verify(const wrapper::CartesianVelocity& velocity)
+{
+  if((velocity.has_angular() && !verify(velocity.angular())) ||
+     (velocity.has_linear() && !verify(velocity.linear())))
+  {
+    return false;
+  }
+
+  return true;
+}
+
 } // end namespace egm
 } // end namespace abb
