@@ -173,11 +173,11 @@ const std::string& EGMControllerInterface::callback(const UDPServerData& server_
     }
     else
     {
+      // Make the current inputs available (to the external control loop), and notify that it is available.
+      controller_motion_.writeInputs(inputs_.current());
+
       if (inputs_.isFirstMessage() || inputs_.statesOk())
       {
-        // Make the current inputs available (to the external control loop), and notify that it is available.
-        controller_motion_.writeInputs(inputs_.current());
-
         // Wait for new outputs (from the external control loop), or until a timeout occurs.
         controller_motion_.readOutputs(&outputs_.current);
       }
