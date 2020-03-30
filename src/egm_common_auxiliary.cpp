@@ -728,6 +728,20 @@ bool parse(wrapper::Joints* p_target_robot,
 
     switch (axes)
     {
+      case None:
+      {
+        if (source_robot.joints_size() == 0)
+        {
+          for (int i = 0; i < source_external.joints_size(); ++i)
+          {
+            p_target_external->add_values(source_external.joints(i));
+          }
+
+          success = true;
+        }
+      }
+      break;
+
       case Six:
       {
         if (source_robot.joints_size() == Constants::RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS)
@@ -842,7 +856,14 @@ bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAx
 
     if (success)
     {
-      success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      if(axes == None)
+      {
+        success = !source.has_cartesian();
+      }
+      else
+      {
+        success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      }
 
       if (success)
       {
@@ -866,7 +887,14 @@ bool parse(wrapper::Planned* p_target, const EgmPlanned& source, const RobotAxes
 
     if (success)
     {
-      success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      if(axes == None)
+      {
+        success = !source.has_cartesian();
+      }
+      else
+      {
+        success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+      }
 
       if (success)
       {

@@ -48,6 +48,7 @@ namespace egm
  */
 enum RobotAxes
 {
+  None  = 0, ///< \brief No robot axes are expected (i.e. only external axes).
   Six   = 6, ///< \brief A six axes robot.
   Seven = 7  ///< \brief A seven axes robot.
 };

@@ -194,7 +194,7 @@ wrapper::trajectory::ExecutionProgress_SubState EGMTrajectoryInterface::Trajecto
 void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::resetMotionStep()
 {
   unsigned int robot_joints = data.feedback.robot().joints().position().values_size();
-  unsigned int external_joints = data.feedback.robot().joints().position().values_size();
+  unsigned int external_joints = data.feedback.external().joints().position().values_size();
 
   internal_goal.Clear();
   external_goal.Clear();
@@ -243,7 +243,7 @@ void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::resetMotionStep()
 void EGMTrajectoryInterface::TrajectoryMotion::MotionStep::prepareNormalGoal(const bool last_point)
 {
   unsigned int robot_joints = data.feedback.robot().joints().position().values_size();
-  unsigned int external_joints = data.feedback.robot().joints().position().values_size();
+  unsigned int external_joints = data.feedback.external().joints().position().values_size();
 
   data.mode = (external_goal.robot().has_cartesian() ? EGMPose : EGMJoint);
 
@@ -394,7 +394,7 @@ double EGMTrajectoryInterface::TrajectoryMotion::MotionStep::estimateDuration()
   double estimate = 0.0;
 
   unsigned int robot_joints = data.feedback.robot().joints().position().values_size();
-  unsigned int external_joints = data.feedback.robot().joints().position().values_size();
+  unsigned int external_joints = data.feedback.external().joints().position().values_size();
 
   // Reset robot joint values.
   reset(internal_goal.mutable_robot()->mutable_joints()->mutable_velocity(), robot_joints);
