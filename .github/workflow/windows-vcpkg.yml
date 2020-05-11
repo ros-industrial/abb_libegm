@@ -1,0 +1,31 @@
+name: Windows vcpkg Workflow
+
+on:
+  push:
+  pull_request:
+  schedule:
+  # * is a special character in YAML so you have to quote this string
+  # Execute a "nightly" build at 2 AM UTC 
+  - cron:  '0 2 * * *'
+
+jobs:
+  build:
+    name: 'Windows vcpkg job'
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@master
+        
+    - name: Install vcpkg Dependencies
+      shell: bash
+      run: |
+        ${VCPKG_INSTALLATION_ROOT}/vcpkg.exe install --triplet x64-windows boost-asio boost-math boost-smart-ptr protobuf 
+
+    - name: Build the project 
+      shell: bash
+      run: | 
+        mkdir  build
+        cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=${VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake ..
+        cmake --config Release --build .
+        cmake --install .
