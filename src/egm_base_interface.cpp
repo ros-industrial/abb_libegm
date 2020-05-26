@@ -115,7 +115,7 @@ void EGMBaseInterface::InputContainer::updatePrevious()
 bool EGMBaseInterface::InputContainer::statesOk() const
 {
   return (current_.status().motor_state() == wrapper::Status_MotorState_MOTORS_ON &&
-          current_.status().rapid_execution_state() == wrapper::Status_RAPIDExecutionState_RAPID_RUNNING &&
+          current_.status().rapid_execution_state() != wrapper::Status_RAPIDExecutionState_RAPID_STOPPED &&
           current_.status().egm_state() == wrapper::Status_EGMState_EGM_RUNNING);
 }
 
