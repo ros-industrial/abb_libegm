@@ -592,6 +592,20 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
 
     switch (configuration.axes)
     {
+      case None:
+      {
+        if (robot_velocity.values_size() == 0)
+        {
+          for (int i = 0; i < external_velocity.values_size() && i < ext_condition; ++i)
+          {
+            speed_reference->mutable_externaljoints()->add_joints(external_velocity.values(i));
+          }
+
+          speed_ok = true;
+        }
+      }
+      break;
+
       case Six:
       {
         if (robot_velocity.values_size() == rob_condition)
