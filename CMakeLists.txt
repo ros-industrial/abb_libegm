@@ -25,14 +25,17 @@ find_package(Boost REQUIRED COMPONENTS regex system thread)
 #############################
 ## Google Protocol Buffers ##
 #############################
+
+# Temporary workaround for https://github.com/ms-iot/ROSOnWindows/issues/218
 if(WIN32)
-  # For a Chocolatey-based ROS/ROS2 installation, then it appears that the protobuf compiler is
-  # by default installed at ${_CMAKE_INSTALL_DIR}/tools/protobuf, and find_package() doesn't
-  # always seem to find the compiler without specifying a hint.
-  find_package(Protobuf REQUIRED HINTS ${_CMAKE_INSTALL_DIR}/tools/protobuf)
-else()
-  find_package(Protobuf REQUIRED)
+  foreach(prefix IN ITEMS $ENV{CMAKE_PREFIX_PATH})
+    if(${prefix} STREQUAL "C:/opt/rosdeps/x64")
+      list(APPEND CMAKE_PROGRAM_PATH "C:/opt/rosdeps/x64/tools/protobuf")
+    endif()
+  endforeach()
 endif()
+
+find_package(Protobuf REQUIRED)
 
 # Make sure protoc is present, as apparently the above find_package() doesn't check that.
 if(NOT PROTOBUF_PROTOC_EXECUTABLE)
