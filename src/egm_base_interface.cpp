@@ -123,7 +123,8 @@ bool EGMBaseInterface::InputContainer::statesOk() const
   // it has clearly been started. Allowing both RUNNING and UNDEFINED states to be acceptable is a workaround for this.
   // The rationale is also that the robot controller should internally ignore EGM commands if it's in a bad state.
   return (current_.status().motor_state() == wrapper::Status_MotorState_MOTORS_ON &&
-          current_.status().rapid_execution_state() != wrapper::Status_RAPIDExecutionState_RAPID_STOPPED &&
+          (current_.status().rapid_execution_state() == wrapper::Status_RAPIDExecutionState_RAPID_UNDEFINED ||
+           current_.status().rapid_execution_state() == wrapper::Status_RAPIDExecutionState_RAPID_RUNNING) &&
           current_.status().egm_state() == wrapper::Status_EGMState_EGM_RUNNING);
 }
 
