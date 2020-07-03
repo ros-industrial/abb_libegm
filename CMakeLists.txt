@@ -66,6 +66,10 @@ if(NOT DEFINED BUILD_SHARED_LIBS)
   option(BUILD_SHARED_LIBS "Build dynamically-linked binaries" ON)
 endif()
 
+if(NOT DEFINED BUILD_TESTING)
+  option(BUILD_TESTING "Build tests" OFF)
+endif()
+
 set(
   SRC_FILES
     src/egm_base_interface.cpp
@@ -163,3 +167,10 @@ install(
   FILE ${PROJECT_NAME}Targets.cmake
   NAMESPACE ${PROJECT_NAME}::
 )
+
+if(BUILD_TESTING)
+  enable_testing()
+  add_executable(egm_common_auxiliary_TEST tests/egm_common_auxiliary_test.cpp)
+  target_link_libraries(egm_common_auxiliary_TEST PRIVATE ${PROJECT_NAME}::${PROJECT_NAME})
+  add_test(NAME egm_common_auxiliary_TEST COMMAND egm_common_auxiliary_TEST)
+endif()
