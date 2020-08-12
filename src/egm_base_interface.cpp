@@ -761,6 +761,9 @@ bool EGMBaseInterface::OutputContainer::constructCartesianBody(const BaseConfigu
  * Class definitions: EGMBaseInterface
  */
 
+// See https://stackoverflow.com/questions/16957458/static-const-in-c-class-undefined-reference/16957554
+const unsigned int EGMBaseInterface::WAIT_TIME_MS;
+
 /************************************************************
  * Primary methods
  */
