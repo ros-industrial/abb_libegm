@@ -367,7 +367,7 @@ private:
 
   /**
    * \brief Class for Slerp (Spherical linear interpolation) for quaternions.
-   *        Slerp with unit quaternions produce a roataion with uniform angular speed.
+   *        Slerp with unit quaternions produce a rotation with uniform angular speed.
    *
    * I.e. Slerp(q0, q1; t) = [sin((1-t)*omega)/sin(omega)]*q0 + [sin(t*omega)/sin(omega)]*q1.
    *      Where q0 and q1 are quaternions and cos(omega) = q0*q1 (dot product).

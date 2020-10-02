@@ -91,7 +91,7 @@ message EgmSpeedRef				// Speed reference values for robot (joint or cartesian) 
 }
 
 
-message EgmPathCorr				// Cartesian path correction and measurment age
+message EgmPathCorr				// Cartesian path correction and measurement age
 {
     required EgmCartesian   pos = 1;	// Sensor measurement (x, y, z) relative the sensor tool coordinate system
 	required uint32			age = 2;	// Sensor measurement age in ms

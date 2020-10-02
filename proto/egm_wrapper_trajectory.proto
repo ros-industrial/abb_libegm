@@ -37,7 +37,7 @@ message JointGoal
 
 // Notes:
 // - The Euler angles have higher priority than the quaternions (parts of the pose component).
-// - Only linear velocity, because the orientation interporlation method (i.e. Slerp) result in uniform angular speed.
+// - Only linear velocity, because the orientation interpolation method (i.e. Slerp) result in uniform angular speed.
 // - Only linear acceleration, and it is only used as potential input for interpolation.
 message CartesianGoal
 {

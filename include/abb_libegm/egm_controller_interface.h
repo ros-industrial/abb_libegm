@@ -76,7 +76,7 @@ public:
    *
    * \param timeout_ms for specifying a timeout in [ms]. If omitted, then the method waits forever.
    *
-   * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occured.
+   * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occurred.
    */
   bool waitForMessage(const unsigned int timeout_ms = 0);
 
@@ -118,7 +118,7 @@ private:
      *
      * \param timeout_ms for specifying a timeout in [ms]. If omitted, then the method waits forever.
      *
-     * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occured.
+     * \return bool indicating if the wait was successful or not. I.e. returns false if a timeout has occurred.
      */
     bool waitForMessage(const unsigned int timeout_ms);
 

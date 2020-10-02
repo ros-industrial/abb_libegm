@@ -186,7 +186,7 @@ struct BaseConfiguration
 struct TrajectoryConfiguration
 {
   /**
-   * \brief Enum for the available spline ploynomial interpolation methods.
+   * \brief Enum for the available spline polynomial interpolation methods.
    *
    * Note: Cartesian orientation uses Slerp interpolation instead.
    *

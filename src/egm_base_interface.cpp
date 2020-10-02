@@ -786,7 +786,7 @@ configuration_(configuration)
 const std::string& EGMBaseInterface::callback(const UDPServerData& server_data)
 {
   // Initialize the callback by:
-  // - Parsing and extracting data from the recieved message.
+  // - Parsing and extracting data from the received message.
   // - Updating any pending configuration changes.
   // - Preparing the outputs.
   if (initializeCallback(server_data))
@@ -857,7 +857,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
 {
   bool success = false;
 
-  // Parse the recieved message.
+  // Parse the received message.
   if (server_data.p_data)
   {
     success = inputs_.parseFromArray(server_data.p_data, server_data.bytes_transferred);
