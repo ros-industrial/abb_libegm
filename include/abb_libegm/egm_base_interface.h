@@ -56,7 +56,7 @@ namespace egm
  * \brief Class for processing asynchronous callbacks.
  *
  * The class provides behavior for:
- * - Processing asynchronous callbacks from a UDP server. The interface recieves the robot controller's
+ * - Processing asynchronous callbacks from a UDP server. The interface receives the robot controller's
  *   outbound messages and construct inbound messages to the robot controller.
  * - This class can for example be used as a foundation for custom made user interfaces.
  */
@@ -371,7 +371,7 @@ protected:
     wrapper::Output previous_;
 
     /**
-     * \brief The sequance number, in the current communication session.
+     * \brief The sequence number, in the current communication session.
      */
     unsigned int sequence_number_;
 

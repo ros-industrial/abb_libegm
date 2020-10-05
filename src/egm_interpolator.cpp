@@ -429,7 +429,7 @@ void EGMInterpolator::Slerp::evaluate(wrapper::trajectory::CartesianGoal* p_outp
   conj_q.set_u2(-p_q->u2());
   conj_q.set_u3(-p_q->u3());
 
-  // Derivate of either linear or Slerp interploation.
+  // Derivate of either linear or Slerp interpolation.
   wrapper::Quaternion d_q;
   d_q.set_u0(c*q0_.u0() + d*q1_.u0());
   d_q.set_u1(c*q0_.u1() + d*q1_.u1());

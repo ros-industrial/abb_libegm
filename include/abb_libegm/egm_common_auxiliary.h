@@ -63,7 +63,7 @@ double saturate(const double value, const double lower, const double upper);
  * \brief Multiply all values in a joints object with a factor.
  *
  * \param p_j for the joints object.
- * \param factor for the value to multipy with.
+ * \param factor for the value to multiply with.
  */
 void multiply(wrapper::Joints* p_j, const double factor);
 
@@ -71,7 +71,7 @@ void multiply(wrapper::Joints* p_j, const double factor);
  * \brief Multiply all values in a Cartesian object with a factor.
  *
  * \param p_c for the Cartesian object.
- * \param factor for the value to multipy with.
+ * \param factor for the value to multiply with.
  */
 void multiply(wrapper::Cartesian* p_c, const double factor);
 
@@ -79,7 +79,7 @@ void multiply(wrapper::Cartesian* p_c, const double factor);
  * \brief Multiply all values in an Euler object with a factor.
  *
  * \param p_e for the Euler object.
- * \param factor for the value to multipy with.
+ * \param factor for the value to multiply with.
  */
 void multiply(wrapper::Euler* p_e, const double factor);
 
@@ -87,7 +87,7 @@ void multiply(wrapper::Euler* p_e, const double factor);
  * \brief Multiply all values in a quaternion object with a factor.
  *
  * \param p_q for the quaternion object.
- * \param factor for the value to multipy with.
+ * \param factor for the value to multiply with.
  */
 void multiply(wrapper::Quaternion* p_q, const double factor);
 
@@ -153,7 +153,7 @@ void convert(wrapper::Euler* p_e, const wrapper::Quaternion& q);
 void convert(wrapper::Quaternion* p_dq, const wrapper::Quaternion& previous_q, const wrapper::Euler& av);
 
 /**
- * \brief Estimate joint velocites.
+ * \brief Estimate joint velocities.
  *
  * The estimation will fail if the sample time is less than or equal to zero.
  *
