@@ -22,7 +22,7 @@ jobs:
     - name: Restore from cache and run vcpkg
       uses: lukka/run-vcpkg@v3
       with:
-        vcpkgArguments: '--triplet x64-windows boost-asio boost-math boost-smart-ptr protobuf'
+        vcpkgArguments: '--triplet x64-windows boost-asio boost-smart-ptr protobuf'
         # commit from vcpkg's master branch on 2020/06/01
         vcpkgGitCommitId: 6d36e2a86baf8d227fc6dce587bd69997d67fb5e
         # Workaround for https://github.com/ros-industrial/abb_libegm/pull/101#discussion_r433370614

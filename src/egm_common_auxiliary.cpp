@@ -256,6 +256,79 @@ bool estimateVelocities(wrapper::Joints* p_estimate,
   return success;
 }
 
+// Small private helper class for quaternion computation
+struct InternalQuaternion
+{
+public:
+  double u0;
+  double u1;
+  double u2;
+  double u3;
+
+  InternalQuaternion()
+  {
+  }
+
+  InternalQuaternion(const wrapper::Quaternion& in)
+  {
+    u0 = in.u0();
+    u1 = in.u1();
+    u2 = in.u2();
+    u3 = in.u3();
+  }
+
+  InternalQuaternion operator*(const InternalQuaternion& other) const
+  {
+      // https://www.mathworks.com/help/aeroblks/quaternionmultiplication.html
+      InternalQuaternion out;
+      out.u0 = other.u0 * this->u0 - other.u1 * this->u1 - other.u2 * this->u2 - other.u3 * this->u3;
+      out.u1 = other.u0 * this->u1 + other.u1 * this->u0 - other.u2 * this->u3 + other.u3 * this->u2;
+      out.u2 = other.u0 * this->u2 + other.u1 * this->u3 + other.u2 * this->u0 - other.u3 * this->u1;
+      out.u3 = other.u0 * this->u3 - other.u1 * this->u2 + other.u2 * this->u1 + other.u3 * this->u0;
+      return out;
+  }
+
+  InternalQuaternion operator-(const InternalQuaternion& other) const
+  {
+    InternalQuaternion out;
+    out.u0 = this->u0 - other.u0;
+    out.u1 = this->u1 - other.u1;
+    out.u2 = this->u2 - other.u2;
+    out.u3 = this->u3 - other.u3;
+    return out;
+  }
+
+  InternalQuaternion operator/(const double& other) const
+  {
+    InternalQuaternion out;
+    out.u0 = this->u0 / other;
+    out.u1 = this->u1 / other;
+    out.u2 = this->u2 / other;
+    out.u3 = this->u3 / other;
+    return out;
+  }
+};
+
+InternalQuaternion operator*(const double& scalar, const InternalQuaternion& quat)
+{
+  InternalQuaternion out;
+  out.u0 = scalar * quat.u0;
+  out.u1 = scalar * quat.u1;
+  out.u2 = scalar * quat.u2;
+  out.u3 = scalar * quat.u3;
+  return out;
+}
+
+InternalQuaternion conj(InternalQuaternion in)
+{
+  InternalQuaternion out;
+  out.u0 = in.u0;
+  out.u1 = -in.u1;
+  out.u2 = -in.u2;
+  out.u3 = -in.u3;
+  return out;
+}
+
 bool estimateVelocities(wrapper::Euler* p_estimate,
                         const wrapper::Quaternion& current,
                         const wrapper::Quaternion& previous,
@@ -269,17 +342,15 @@ bool estimateVelocities(wrapper::Euler* p_estimate,
     // See for example https://en.wikipedia.org/wiki/Rotation_formalisms_in_three_dimensions for equations.
     // Note: Only valid for orientations, for the same object, at two points close in time.
     // Also assumes constant angular velocity between the points.
-    boost::math::quaternion<double> q1(previous.u0(), previous.u1(),
-                                       previous.u2(), previous.u3());
+    InternalQuaternion q1(previous);
 
-    boost::math::quaternion<double> q2(current.u0(), current.u1(),
-                                       current.u2(), current.u3());
+    InternalQuaternion q2(current);
 
-    boost::math::quaternion<double> estimation = ((2.0*(q2 - q1) / sample_time)*boost::math::conj(q1));
+    InternalQuaternion estimation = ((2.0*(q2 - q1) / sample_time)*conj(q1));
 
-    p_estimate->set_x(estimation.R_component_2()*Constants::Conversion::RAD_TO_DEG);
-    p_estimate->set_y(estimation.R_component_3()*Constants::Conversion::RAD_TO_DEG);
-    p_estimate->set_z(estimation.R_component_4()*Constants::Conversion::RAD_TO_DEG);
+    p_estimate->set_x(estimation.u1*Constants::Conversion::RAD_TO_DEG);
+    p_estimate->set_y(estimation.u2*Constants::Conversion::RAD_TO_DEG);
+    p_estimate->set_z(estimation.u3*Constants::Conversion::RAD_TO_DEG);
 
     success = true;
   }
