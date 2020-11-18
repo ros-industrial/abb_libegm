@@ -20,11 +20,11 @@ jobs:
     # Restore from cache the previously built ports. If "cache miss"
     # then provision vcpkg, install desired ports, finally cache everything for the next run.
     - name: Restore from cache and run vcpkg
-      uses: lukka/run-vcpkg@v3
+      uses: lukka/run-vcpkg@v5
       with:
         vcpkgArguments: '--triplet x64-windows boost-asio boost-math boost-smart-ptr protobuf'
-        # commit from vcpkg's master branch on 2020/06/01
-        vcpkgGitCommitId: 6d36e2a86baf8d227fc6dce587bd69997d67fb5e
+        # commit corresponding to vcpkg's release v2020.11
+        vcpkgGitCommitId: 0bf3923f9fab4001c00f0f429682a0853b5749e0
         # Workaround for https://github.com/ros-industrial/abb_libegm/pull/101#discussion_r433370614
         # This line can be removed once protobuf is  linked via its imported CMake targets
         vcpkgDirectory: '${{ github.workspace }}/../vcpkg'  
