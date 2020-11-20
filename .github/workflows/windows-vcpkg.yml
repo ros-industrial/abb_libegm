@@ -23,8 +23,8 @@ jobs:
       uses: lukka/run-vcpkg@v5
       with:
         vcpkgArguments: '--triplet x64-windows boost-asio boost-math boost-smart-ptr protobuf'
-        # Commit corresponding to vcpkg's release v2020.11.
-        vcpkgGitCommitId: 0bf3923f9fab4001c00f0f429682a0853b5749e0
+        # Commit corresponding to vcpkg's master branch on 2020-11-20.
+        vcpkgGitCommitId: e803bf11296d8e7900dafb41e7b1224778d33dc6
         # Workaround for https://github.com/ros-industrial/abb_libegm/pull/101#discussion_r433370614.
         # This line can be removed once protobuf is linked via its imported CMake targets.
         vcpkgDirectory: '${{ github.workspace }}/../vcpkg'
