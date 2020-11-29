@@ -37,6 +37,9 @@
 #ifndef EGM_COMMON_H
 #define EGM_COMMON_H
 
+#include <boost/shared_ptr.hpp>
+#include <boost/thread/condition_variable.hpp>
+
 #include "abb_libegm_export.h"
 
 namespace abb
@@ -178,6 +181,13 @@ struct BaseConfiguration
    * \brief Maximum duration [s] to log data.
    */
   double max_logging_duration;
+
+  /**
+   * \brief Optional condition variable intended for notifying an external control loop that a new message is available.
+   *
+   * Note: This is only intended to be used in the EGMControllerInterface class.
+   */
+  boost::shared_ptr<boost::condition_variable> p_new_message_cv;
 };
 
 /**
