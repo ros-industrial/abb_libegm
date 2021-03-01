@@ -107,23 +107,19 @@ public:
    *
    * \param io_service for operating boost asio's asynchronous functions.
    * \param port_number for the server's UDP socket.
-   * \param p_interface that processes the received messages.
+   * \param interface UDP server that processes the received messages.
+   * 
+   * \throw \a std::exception if an error occurs.
    */
   UDPServer(boost::asio::io_service& io_service,
             unsigned short port_number,
-            AbstractUDPServerInterface* p_interface);
+            AbstractUDPServerInterface& interface);
 
   /**
    * \brief A destructor.
    */
   ~UDPServer();
 
-  /**
-   * \brief Checks if the server was successfully initialized or not.
-   *
-   * \return bool true if and only if the server was initialized correctly.
-   */
-  bool isInitialized() const;
 
 private:
   /**
@@ -155,7 +151,7 @@ private:
   /**
    * \brief The server's UDP socket.
    */
-  boost::shared_ptr<boost::asio::ip::udp::socket> p_socket_;
+  boost::asio::ip::udp::socket socket_;
 
   /**
    * \brief The address of the calling computer (e.g. an ABB robot controller or a virtual controller in RobotStudio).
@@ -170,17 +166,12 @@ private:
   /**
    * \brief Pointer to an object that is derived from AbstractUDPSeverInterface, which processes the received messages.
    */
-  AbstractUDPServerInterface* p_interface_;
+  AbstractUDPServerInterface& interface_;
 
   /**
    * \brief Container for server data.
    */
   UDPServerData server_data_;
-
-  /**
-   * \brief Flag indicating if the server was initialized successfully or not.
-   */
-  bool initialized_;
 };
 
 } // end namespace egm

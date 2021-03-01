@@ -48,57 +48,27 @@ namespace egm
 
 UDPServer::UDPServer(boost::asio::io_service& io_service,
                      unsigned short port_number,
-                     AbstractUDPServerInterface* p_interface)
-:
-initialized_(false),
-p_interface_(p_interface)
+                     AbstractUDPServerInterface& interface)
+: socket_ {io_service, boost::asio::ip::udp::endpoint {boost::asio::ip::udp::v4(), port_number}}
+, interface_ {interface}
 {
-  bool success = true;
-
-  try
-  {
-    server_data_.port_number = port_number;
-    p_socket_.reset(new boost::asio::ip::udp::socket(io_service,
-                                                     boost::asio::ip::udp::endpoint(boost::asio::ip::udp::v4(),
-                                                                                    port_number)));
-  }
-  catch (std::exception e)
-  {
-    success = false;
-  }
-
-  if (success)
-  {
-    initialized_ = true;
-    startAsynchronousReceive();
-  }
+  server_data_.port_number = port_number;
+  startAsynchronousReceive();
 }
 
 UDPServer::~UDPServer()
 {
-  if (p_socket_)
-  {
-    p_socket_->close();
-    p_socket_.reset();
-  }
-}
-
-bool UDPServer::isInitialized() const
-{
-  return initialized_;
+  socket_.close();
 }
 
 void UDPServer::startAsynchronousReceive()
 {
-  if (p_socket_)
-  {
-    p_socket_->async_receive_from(boost::asio::buffer(receive_buffer_),
-                                  remote_endpoint_,
-                                  boost::bind(&UDPServer::receiveCallback,
-                                              this,
-                                              boost::asio::placeholders::error,
-                                              boost::asio::placeholders::bytes_transferred));
-  }
+  socket_.async_receive_from(boost::asio::buffer(receive_buffer_),
+                                remote_endpoint_,
+                                boost::bind(&UDPServer::receiveCallback,
+                                            this,
+                                            boost::asio::placeholders::error,
+                                            boost::asio::placeholders::bytes_transferred));
 }
 
 void UDPServer::receiveCallback(const boost::system::error_code& error, const std::size_t bytes_transferred)
@@ -106,15 +76,15 @@ void UDPServer::receiveCallback(const boost::system::error_code& error, const st
   server_data_.p_data = receive_buffer_;
   server_data_.bytes_transferred = (int) bytes_transferred;
 
-  if (error == boost::system::errc::success && p_interface_)
+  if (error == boost::system::errc::success)
   {
     // Process the received data via the callback method (creates the reply message).
-    const std::string& reply = p_interface_->callback(server_data_);
+    const std::string& reply = interface_.callback(server_data_);
 
-    if (!reply.empty() && p_socket_)
+    if (!reply.empty())
     {
       // Send the response message to the robot controller.
-      p_socket_->async_send_to(boost::asio::buffer(reply),
+      socket_.async_send_to(boost::asio::buffer(reply),
                                remote_endpoint_,
                                boost::bind(&UDPServer::sendCallback,
                                            this,
