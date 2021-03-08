@@ -49,12 +49,21 @@ namespace egm
 UDPServer::UDPServer(boost::asio::io_service& io_service,
                      unsigned short port_number,
                      AbstractUDPServerInterface& interface)
-: socket_ {io_service, boost::asio::ip::udp::endpoint {boost::asio::ip::udp::v4(), port_number}}
+: UDPServer {io_service, boost::asio::ip::udp::endpoint {boost::asio::ip::udp::v4(), port_number}, interface}
+{
+}
+
+
+UDPServer::UDPServer(boost::asio::io_service& io_service,
+            boost::asio::ip::udp::endpoint const& server_endpoint,
+            AbstractUDPServerInterface& interface)
+: socket_ {io_service, server_endpoint}
 , interface_ {interface}
 {
-  server_data_.port_number = port_number;
+  server_data_.port_number = server_endpoint.port();
   startAsynchronousReceive();
 }
+
 
 UDPServer::~UDPServer()
 {

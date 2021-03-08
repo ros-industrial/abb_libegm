@@ -115,6 +115,21 @@ public:
             unsigned short port_number,
             AbstractUDPServerInterface& interface);
 
+
+  /**
+   * \brief Start UDP server on a specified address and port.
+   *
+   * \param io_service for operating boost asio's asynchronous functions.
+   * \param server_endpoint server's UDP endpoint.
+   * \param interface UDP server that processes the received messages.
+   * 
+   * \throw \a std::exception if an error occurs.
+   */
+  UDPServer(boost::asio::io_service& io_service,
+            boost::asio::ip::udp::endpoint const& server_endpoint,
+            AbstractUDPServerInterface& interface);
+
+
   /**
    * \brief A destructor.
    */
