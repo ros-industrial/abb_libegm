@@ -1,13 +1,13 @@
 name: Windows vcpkg Workflow
 
 on:
-  push:
-    branches:
-      - master
+  # direct pushes to protected branches are not supported
   pull_request:
+  # run every day, at 2am UTC
   schedule:
-  # Execute a "nightly" build at 2 AM UTC.
-  - cron:  '0 2 * * *'
+    - cron: '0 2 * * *'
+  # allow manually starting this workflow
+  workflow_dispatch:
 
 jobs:
   build:
