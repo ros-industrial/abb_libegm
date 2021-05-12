@@ -772,7 +772,7 @@ EGMBaseInterface::EGMBaseInterface(boost::asio::io_service& io_service,
                                    const unsigned short port_number,
                                    const BaseConfiguration& configuration)
 :
-udp_server_(io_service, port_number, this),
+udp_server_(io_service, port_number, *this),
 configuration_(configuration)
 {
   if (configuration_.active.use_logging)
@@ -913,7 +913,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
 
 bool EGMBaseInterface::isInitialized()
 {
-  return udp_server_.isInitialized();
+  return true;
 }
 
 bool EGMBaseInterface::isConnected()
