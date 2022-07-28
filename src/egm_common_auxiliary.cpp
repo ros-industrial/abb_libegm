@@ -42,6 +42,8 @@
 
 #include "abb_libegm/egm_common_auxiliary.h"
 
+#include <iostream>
+
 namespace abb
 {
 namespace egm
@@ -723,6 +725,8 @@ bool parse(wrapper::Joints* p_target_robot,
 
   if (p_target_robot && p_target_external)
   {
+    std::cout << "    [egm_common_auxiliary::parse()] source_robot.joints_size: "
+              << source_robot.joints_size() << std::endl;
     p_target_robot->Clear();
     p_target_external->Clear();
 
@@ -742,6 +746,24 @@ bool parse(wrapper::Joints* p_target_robot,
       }
       break;
 
+      case Four:
+      {
+        if (source_robot.joints_size() == 4)
+        {
+          for (int i = 0; i < source_robot.joints_size(); ++i)
+          {
+            p_target_robot->add_values(source_robot.joints(i));
+          }
+
+          for (int i = 0; i < source_external.joints_size(); ++i)
+          {
+            p_target_external->add_values(source_external.joints(i));
+          }
+
+          success = true;
+        }
+      }
+      break;
       case Six:
       {
         if (source_robot.joints_size() == Constants::RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS)
