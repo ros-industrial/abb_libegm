@@ -83,6 +83,7 @@ bool EGMBaseInterface::InputContainer::parseFromArray(const char* data, const in
 bool EGMBaseInterface::InputContainer::extractParsedInformation(const RobotAxes& axes)
 {
   bool success = false;
+
   detectRWAndEGMVersions();
 
   if (has_new_data_ &&
@@ -99,6 +100,7 @@ bool EGMBaseInterface::InputContainer::extractParsedInformation(const RobotAxes&
 
     estimated_sample_time_ = estimateSampleTime();
     success = estimateAllVelocities();
+
     has_new_data_ = false;
   }
 
@@ -397,6 +399,7 @@ void EGMBaseInterface::OutputContainer::constructReply(const BaseConfiguration& 
 {
   constructHeader();
   bool success = constructJointBody(configuration);
+
   if (success && configuration.axes != None)
   {
     success = constructCartesianBody(configuration);
@@ -917,6 +920,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   if (success)
   {
     success = inputs_.extractParsedInformation(configuration_.active.axes);
+
     {
       boost::lock_guard<boost::mutex> lock(session_data_.mutex);
 

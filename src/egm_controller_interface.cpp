@@ -128,6 +128,7 @@ void EGMControllerInterface::ControllerMotion::writeOutputs(const wrapper::Outpu
   boost::lock_guard<boost::mutex> lock(write_mutex_);
 
   outputs_.CopyFrom(outputs);
+
   write_data_ready_ = true;
   write_condition_variable_.notify_all();
 }
