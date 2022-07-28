@@ -41,6 +41,7 @@
 #include <boost/math/quaternion.hpp>
 
 #include "abb_libegm/egm_common_auxiliary.h"
+#include "abb_libegm/egm_common.h"
 
 namespace abb
 {
@@ -881,6 +882,22 @@ bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAx
       else
       {
         success = parse(p_target->mutable_robot()->mutable_cartesian()->mutable_pose(), source.cartesian());
+
+        // This is a special case where the joint value for linear axis as reported by the robot is incorrect
+        // Hence we estimate this from the cartesian Z-Axis. This works for the IRB910SC 4-Axis robot
+        if (axes == Four)
+        {
+          if (source.has_cartesian())
+          {
+            auto mutable_values = p_target->mutable_robot()->mutable_joints()->mutable_position()->mutable_values();
+            auto& val = mutable_values->at(Constants::RobotController::INDEX_OF_PRISMATIC_JOINT);
+            val = source.cartesian().pos().z() - Constants::RobotController::Z_AXIS_OFFSET_FOR_FOUR_AXIS_ROBOT;
+          }
+          else
+          {
+            success = false;
+          }
+        }
       }
 
       if (success)

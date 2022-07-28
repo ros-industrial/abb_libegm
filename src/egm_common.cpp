@@ -56,6 +56,8 @@ const int RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS = 6;
 const int RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS = 6;
 const int RobotController::MAX_NUMBER_OF_JOINTS = RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS +
                                                   RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS;
+const int RobotController::INDEX_OF_PRISMATIC_JOINT = 2;
+const double RobotController::Z_AXIS_OFFSET_FOR_FOUR_AXIS_ROBOT = 220.2; // ABB IRB910SC
 
 const double Constants::Conversion::RAD_TO_DEG = 180.0 / M_PI;
 const double Constants::Conversion::DEG_TO_RAD = M_PI / 180.0;
