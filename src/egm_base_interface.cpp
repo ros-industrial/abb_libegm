@@ -635,7 +635,6 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
       }
       break;
 
-      // Same as Six
       case Four:
       {
         // If using a four axes robot (e.g. IRB910SC): Map to special case.
