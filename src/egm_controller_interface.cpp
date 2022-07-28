@@ -128,7 +128,6 @@ void EGMControllerInterface::ControllerMotion::writeOutputs(const wrapper::Outpu
   boost::lock_guard<boost::mutex> lock(write_mutex_);
 
   outputs_.CopyFrom(outputs);
-
   write_data_ready_ = true;
   write_condition_variable_.notify_all();
 }
@@ -160,41 +159,33 @@ EGMBaseInterface(io_service, port_number, configuration)
 
 const std::string& EGMControllerInterface::callback(const UDPServerData& server_data)
 {
-  std::cout << "[EGMControllerInterface::callback()] initializing Callback..." << std::endl;
-
   // Initialize the callback by:
   // - Parsing and extracting data from the received message.
   // - Updating any pending configuration changes.
   // - Preparing the outputs.
   if (initializeCallback(server_data))
   {
-    std::cout << "[EGMControllerInterface::callback()] initializing controller_motion..." << std::endl;
-
     // Additional initialization for direct motion references.
     controller_motion_.initialize(inputs_.isFirstMessage());
 
     // Handle demo execution or external controller execution.
     if (configuration_.active.use_demo_outputs)
     {
-      std::cout << "[EGMControllerInterface::callback()] use_demo_outputs enabled" << std::endl;
       outputs_.generateDemoOutputs(inputs_);
     }
     else
     {
-      std::cout << "[EGMControllerInterface::callback()] use_demo_outputs not enabled" << std::endl;
       // Make the current inputs available (to the external control loop), and notify that it is available.
       controller_motion_.writeInputs(inputs_.current());
 
       // Send a notification via the (optional) external condition variable.
       if(configuration_.active.p_new_message_cv)
       {
-        std::cout << "[EGMControllerInterface::callback()] notifying all" << std::endl;
         configuration_.active.p_new_message_cv->notify_all();
       }
 
       if (inputs_.isFirstMessage() || inputs_.statesOk())
       {
-        std::cout << "[EGMControllerInterface::callback()] isFirstMessage" << std::endl;
         // Wait for new outputs (from the external control loop), or until a timeout occurs.
         controller_motion_.readOutputs(&outputs_.current);
       }
@@ -206,7 +197,6 @@ const std::string& EGMControllerInterface::callback(const UDPServerData& server_
       logData(inputs_, outputs_, configuration_.active.max_logging_duration);
     }
 
-    std::cout << "[EGMControllerInterface::callback()] Constructing reply..." << std::endl;
     // Constuct the reply message.
     outputs_.constructReply(configuration_.active);
 
@@ -215,7 +205,6 @@ const std::string& EGMControllerInterface::callback(const UDPServerData& server_
     outputs_.updatePrevious();
   }
 
-  std::cout << "[EGMControllerInterface::callback()] replying..." << std::endl;
   // Return the reply.
   return outputs_.reply();
 }

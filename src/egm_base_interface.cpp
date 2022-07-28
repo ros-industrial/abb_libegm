@@ -42,8 +42,6 @@
 #include "abb_libegm/egm_base_interface.h"
 #include "abb_libegm/egm_common_auxiliary.h"
 
-#include <iostream>
-
 namespace abb
 {
 namespace egm
@@ -85,20 +83,7 @@ bool EGMBaseInterface::InputContainer::parseFromArray(const char* data, const in
 bool EGMBaseInterface::InputContainer::extractParsedInformation(const RobotAxes& axes)
 {
   bool success = false;
-
-  std::cout << "  [extractParsedInformation] Input RobotAxes: " << axes << std::endl;
   detectRWAndEGMVersions();
-
-  bool ok;
-  std::cout << "  [extractParsedInformation] has_new_data: " << has_new_data_ << std::endl;
-  ok = parse(current_.mutable_header(), egm_robot_.header());
-  std::cout << "Ok after parsing mutable_header: " << ok << std::endl;
-  ok = parse(current_.mutable_feedback(), egm_robot_.feedback(), axes);
-  std::cout << "Ok after parsing mutable_feedback: " << ok << std::endl;
-  ok = parse(current_.mutable_planned(), egm_robot_.planned(), axes);
-  std::cout << "Ok after parsing mutable_planned: " << ok << std::endl;
-  ok =  parse(current_.mutable_status(), egm_robot_);
-  std::cout << "Ok after parsing mutable_status: " << ok << std::endl;
 
   if (has_new_data_ &&
       parse(current_.mutable_header(), egm_robot_.header()) &&
@@ -106,25 +91,17 @@ bool EGMBaseInterface::InputContainer::extractParsedInformation(const RobotAxes&
       parse(current_.mutable_planned(), egm_robot_.planned(), axes) &&
       parse(current_.mutable_status(), egm_robot_))
   {
-    std::cout << "  [extractParsedInformation] has_new_data and all parse true " << std::endl;
     if (first_message_)
     {
-      std::cout << "  [extractParsedInformation] first_message_ is true: " << std::endl;
       initial_.CopyFrom(current_);
       previous_.CopyFrom(current_);
     }
 
     estimated_sample_time_ = estimateSampleTime();
-    std::cout << "  [extractParsedInformation] success before estimateAllVelocities(): "
-              << success << std::endl;
     success = estimateAllVelocities();
-    std::cout << "  [extractParsedInformation] success after estimateAllVelocities(): "
-              << success << std::endl;
     has_new_data_ = false;
   }
 
-  std::cout << "  [extractParsedInformation] success before returning: "
-            << success << std::endl;
   return success;
 }
 
@@ -157,7 +134,6 @@ void EGMBaseInterface::InputContainer::detectRWAndEGMVersions()
 {
   if(has_new_data_)
   {
-    std::cout << "[detectRWAndEGMVersions] has_new_data" << std::endl;
     // Time field was added in RobotWare '6.07', as well as fix of inconsistent units (e.g. radians and degrees).
     if(egm_robot_.feedback().has_time())
     {
@@ -191,13 +167,9 @@ void EGMBaseInterface::InputContainer::detectRWAndEGMVersions()
   }
   else
   {
-    std::cout << "[detectRWAndEGMVersions] No new data. Setting RW & EGM version to unknown" << std::endl;
     current_.mutable_header()->set_rw_version(wrapper::Header_RWVersion_RW_UNKNOWN);
     current_.mutable_header()->set_egm_version(wrapper::Header_EGMVersion_EGM_UNKNOWN);
   }
-  std::cout << "[detectRWAndEGMVersions] set_rw_version to: " << current_.header().rw_version() << std::endl;
-  std::cout << "[detectRWAndEGMVersions] set_egm_version to: " << current_.header().egm_version() << std::endl;
-
 }
 
 double EGMBaseInterface::InputContainer::estimateSampleTime()
@@ -425,28 +397,18 @@ void EGMBaseInterface::OutputContainer::constructReply(const BaseConfiguration& 
 {
   constructHeader();
   bool success = constructJointBody(configuration);
-  std::cout << "[EGMBaseInterface::constructReply()] success after constructJointBody(): "
-            <<  success << std::endl;
-
   if (success && configuration.axes != None)
   {
-    std::cout << "constructing cartesian body" << std::endl;
     success = constructCartesianBody(configuration);
-    std::cout << "[EGMBaseInterface::constructReply()] success after constructCartesianBody(): "
-          <<  success << std::endl;
   }
 
   if (success)
   {
-    std::cout << "Serializing to string" << std::endl;
     success = egm_sensor_.SerializeToString(&reply_);
-    std::cout << "[EGMBaseInterface::constructReply()] success after SerializeToString(): "
-          <<  success << std::endl;
   }
 
   if (!success)
   {
-    std::cout << "   success is false CLEARING REPLY" << std::endl;
     reply_.clear();
   }
 }
@@ -539,8 +501,7 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
 
   int rob_condition = Constants::RobotController::DEFAULT_NUMBER_OF_ROBOT_JOINTS;
   int ext_condition = Constants::RobotController::DEFAULT_NUMBER_OF_EXTERNAL_JOINTS;
-  std::cout << "[constructJointBody] rob_condition: " << rob_condition << std::endl;
-  std::cout << "[constructJointBody] ext_condition: " << ext_condition << std::endl;
+
   if (current.robot().joints().has_position())
   {
     // Outputs.
@@ -937,15 +898,12 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   // Parse the received message.
   if (server_data.p_data)
   {
-    std::cout << "server_data.p_data is true. calling parseFromArray()" <<std::endl;
     success = inputs_.parseFromArray(server_data.p_data, server_data.bytes_transferred);
-    std::cout << "success after parsing: " << success <<std::endl;
   }
 
   // Update configuration, if requested to do so.
   if (success && inputs_.isFirstMessage())
   {
-    std::cout << "success && inputs_.isFirstMessage()" <<std::endl;
     boost::lock_guard<boost::mutex> lock(configuration_.mutex);
 
     if (configuration_.has_pending_update)
@@ -958,9 +916,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   // Extract information from the parsed message.
   if (success)
   {
-    std::cout << "success. Calling extractParsedInformation()..." <<std::endl;
     success = inputs_.extractParsedInformation(configuration_.active.axes);
-    std::cout << "success after parsing: " << success <<std::endl;
     {
       boost::lock_guard<boost::mutex> lock(session_data_.mutex);
 
@@ -972,7 +928,6 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
       }
       else
       {
-        std::cout << "Calling clear" << std::endl;
         session_data_.header.Clear();
         session_data_.status.Clear();
       }
@@ -983,9 +938,7 @@ bool EGMBaseInterface::initializeCallback(const UDPServerData& server_data)
   outputs_.clearReply();
   if (success)
   {
-    std::cout << "success. Calling prepareOutputs()..." <<std::endl;
     outputs_.prepareOutputs(inputs_);
-    std::cout << "success after preparingOutputs: " << success <<std::endl;
   }
 
   return success;
