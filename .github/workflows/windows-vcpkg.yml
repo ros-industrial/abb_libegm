@@ -23,7 +23,8 @@ jobs:
       uses: lukka/run-vcpkg@v10
       with:
         vcpkgArguments: '--triplet x64-windows boost-asio boost-math boost-smart-ptr protobuf'
-        vcpkgGitCommitId: 2023.01.09
+        # Commit corresponding to 2023.01.09
+        vcpkgGitCommitId: f14984af3738e69f197bf0e647a8dca12de92996
         # Workaround for https://github.com/ros-industrial/abb_libegm/pull/101#discussion_r433370614.
         # This line can be removed once protobuf is linked via its imported CMake targets.
         vcpkgDirectory: '${{ github.workspace }}/../vcpkg'
