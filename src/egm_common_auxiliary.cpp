@@ -713,6 +713,22 @@ bool parse(wrapper::Clock* p_target, const EgmClock& source)
   return success;
 }
 
+bool parse(wrapper::RAPIDdata* p_target_robot,
+           const EgmRAPIDdata& source_robot)
+{
+  bool success = false;
+
+  if (p_target_robot)
+  {
+    p_target_robot->Clear();
+    for (int i = 0; i < 6; ++i){
+      p_target_robot->add_dnum(source_robot.dnum(i));
+    }
+    success = true;
+  }
+  return success;
+}
+
 bool parse(wrapper::Joints* p_target_robot,
            wrapper::Joints* p_target_external,
            const EgmJoints& source_robot,

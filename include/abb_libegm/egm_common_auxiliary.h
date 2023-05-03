@@ -361,6 +361,13 @@ bool parse(wrapper::Status* p_target, const EgmRobot& source);
  */
 bool parse(wrapper::Clock* p_target, const EgmClock& source);
 
+
+/** 
+ * Added by Toby Buckley so that joint torques can be read through the RAPIDfromRobot message
+*/
+
+bool parse(wrapper::RAPIDdata* p_target_robot, const EgmRAPIDdata& source_robot);
+
 /**
  * \brief Parse two abb::egm::EgmJoints objects.
  *

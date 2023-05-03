@@ -7,7 +7,7 @@ syntax = "proto2";
 package abb.egm;
 
 message EgmHeader
-{
+{ 
     optional uint32 seqno = 1; // sequence number (to be able to find lost messages)
     optional uint32 tm = 2;    // controller send time stamp in ms
 
@@ -54,11 +54,11 @@ message EgmClock				// Time in seconds and microseconds since 1 Jan 1970
 }
 
 message EgmPose					// Pose (i.e. cartesian position and Quaternion orientation) relative to the correction frame defined by EGMActPose
-{
+{ 
     optional EgmCartesian	pos = 1;
     optional EgmQuaternion	orient = 2;
 	optional EgmEuler		euler = 3;
-}
+} 
 
 message EgmCartesianSpeed 		// Array of 6 speed reference values in mm/s or degrees/s
 {
@@ -91,7 +91,7 @@ message EgmSpeedRef				// Speed reference values for robot (joint or cartesian) 
 }
 
 
-message EgmPathCorr				// Cartesian path correction and measurement age
+message EgmPathCorr				// Cartesian path correction and measurment age
 {
     required EgmCartesian   pos = 1;	// Sensor measurement (x, y, z) relative the sensor tool coordinate system
 	required uint32			age = 2;	// Sensor measurement age in ms
@@ -147,7 +147,19 @@ message EgmTestSignals			// Test signals
 
 message EgmMeasuredForce 				// Array of 6 force values for a robot
 {
-    repeated double force = 1;
+    optional bool   fcActive = 1;
+    repeated double force = 2;
+}
+message EgmCollisionInfo 				// Array of  collision info values for a robot
+{
+    optional bool collsionTriggered = 1;
+    repeated double collDetQuota = 2;
+}
+
+message EgmRAPIDdata				    // message format robot controller outbound
+{
+    optional bool 	digVal = 1;
+    repeated double dnum = 2;
 }
 
 // Robot controller outbound message, sent from the controller to the sensor during position guidance and position streaming
@@ -161,11 +173,14 @@ message EgmRobot
     optional EgmMCIState			mciState = 5;
     optional bool					mciConvergenceMet = 6;
     optional EgmTestSignals			testSignals = 7;
-    optional EgmRapidCtrlExecState	rapidExecState = 8;
+    optional EgmRapidCtrlExecState	rapidExecState = 8; 
     optional EgmMeasuredForce		measuredForce = 9;
     optional double                 utilizationRate=10;
-}
+    optional uint32                 moveIndex=11;
+    optional EgmCollisionInfo       CollisionInfo = 12;
+    optional EgmRAPIDdata 	        RAPIDfromRobot = 13;
 
+}
 
 // Robot controller inbound message, sent from sensor to the controller during position guidance
 message EgmSensor
@@ -173,6 +188,8 @@ message EgmSensor
     optional EgmHeader		header = 1;
     optional EgmPlanned		planned = 2;
     optional EgmSpeedRef	speedRef = 3;
+    optional EgmRAPIDdata   RAPIDtoRobot = 4;
+
 }
 
 // Robot controller inbound message, sent from sensor during path correction

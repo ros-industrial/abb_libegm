@@ -205,6 +205,12 @@ message Planned
   optional Clock    time     = 3;
 }
 
+message RAPIDdata
+{
+    optional bool 	digVal = 1;
+    repeated double dnum = 2;
+}
+
 //======================================================================================================================
 //
 // Primary messages.
@@ -218,6 +224,7 @@ message Input
   optional Feedback feedback = 2;
   optional Planned  planned  = 3;
   optional Status   status   = 4;
+  optional RAPIDdata rapidfromrobot = 13;
 }
 
 // Outputs to send to the robot controller.
