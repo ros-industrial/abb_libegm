@@ -52,6 +52,7 @@ namespace egm
 enum RobotAxes
 {
   None  = 0, ///< \brief No robot axes are expected (i.e. only external axes).
+  Four  = 4, ///< \brief A four axes robot.
   Six   = 6, ///< \brief A six axes robot.
   Seven = 7  ///< \brief A seven axes robot.
 };
@@ -99,6 +100,17 @@ struct Constants
      * \brief Maximum number of joints.
      */
     static const int MAX_NUMBER_OF_JOINTS;
+
+    /**
+     * \brief The index of the prismatic joint if present
+     */
+    static const int INDEX_OF_PRISMATIC_JOINT;
+
+      /**
+     * \brief The z coordinate of the end-effector when the prismatic joint is
+     *  at its minimum value. Measured in mm.
+     */
+    static const double Z_AXIS_OFFSET_FOR_FOUR_AXIS_ROBOT;
   };
 
   /**

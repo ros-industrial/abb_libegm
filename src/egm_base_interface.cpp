@@ -538,6 +538,26 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
       }
       break;
 
+      case Four:
+      {
+        // If using a four axes robot (e.g. IRB910SC)): Map to special case.
+        if (robot_position.values_size() == rob_condition - 2)
+        {
+          for (int i = 0; i < robot_position.values_size(); ++i)
+          {
+            planned->mutable_joints()->add_joints(robot_position.values(i));
+          }
+
+          for (int i = 0; i < external_position.values_size() && i < ext_condition; ++i)
+          {
+            planned->mutable_externaljoints()->add_joints(external_position.values(i));
+          }
+
+          position_ok = true;
+        }
+      }
+      break;
+
       case Six:
       {
         if (robot_position.values_size() == rob_condition)
@@ -605,6 +625,26 @@ bool EGMBaseInterface::OutputContainer::constructJointBody(const BaseConfigurati
       {
         if (robot_velocity.values_size() == 0)
         {
+          for (int i = 0; i < external_velocity.values_size() && i < ext_condition; ++i)
+          {
+            speed_reference->mutable_externaljoints()->add_joints(external_velocity.values(i));
+          }
+
+          speed_ok = true;
+        }
+      }
+      break;
+
+      case Four:
+      {
+        // If using a four axes robot (e.g. IRB910SC): Map to special case.
+        if (robot_velocity.values_size() == rob_condition - 2)
+        {
+          for (int i = 0; i < robot_velocity.values_size(); ++i)
+          {
+            speed_reference->mutable_joints()->add_joints(robot_velocity.values(i));
+          }
+
           for (int i = 0; i < external_velocity.values_size() && i < ext_condition; ++i)
           {
             speed_reference->mutable_externaljoints()->add_joints(external_velocity.values(i));
