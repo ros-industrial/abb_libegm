@@ -389,6 +389,16 @@ bool parse(wrapper::Joints* p_target_robot,
 bool parse(wrapper::CartesianPose* p_target, const EgmPose& source);
 
 /**
+ * \brief Parse an abb::egm::EgmMeasuredForce object.
+ *
+ * \param p_target for containing the parsed data.
+ * \param source containing data to parse.
+ *
+ * \return bool indicating if the parsing was successful or not.
+ */
+bool parse(wrapper::ForceTorque* p_target, const EgmMeasuredForce& source);
+
+/**
  * \brief Parse an abb::egm::EgmFeedBack object.
  *
  * \param p_target for containing the parsed data.

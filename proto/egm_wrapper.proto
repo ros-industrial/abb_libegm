@@ -207,6 +207,32 @@ message Planned
 
 //======================================================================================================================
 //
+// Force torque sensor measurments.
+//
+//======================================================================================================================
+
+message Force
+{
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+}
+
+message Torque
+{
+  optional double x = 1;
+  optional double y = 2;
+  optional double z = 3;
+}
+
+message ForceTorque
+{
+  optional Force force = 1;
+  optional Torque torque = 2;
+}
+
+//======================================================================================================================
+//
 // Primary messages.
 //
 //======================================================================================================================
@@ -218,6 +244,7 @@ message Input
   optional Feedback feedback = 2;
   optional Planned  planned  = 3;
   optional Status   status   = 4;
+  optional ForceTorque forcetorque = 5;
 }
 
 // Outputs to send to the robot controller.

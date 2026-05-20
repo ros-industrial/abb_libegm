@@ -844,6 +844,36 @@ bool parse(wrapper::CartesianPose* p_target, const EgmPose& source)
   return success;
 }
 
+bool parse(wrapper::ForceTorque* p_target, const EgmMeasuredForce& source)
+{
+  if (!p_target)
+  {
+    return false;
+  }
+
+  if (source.force_size() == 6)
+  {
+    // Read out force torque data (6 DOF)
+    p_target->mutable_force()->set_x(source.force().at(0));
+    p_target->mutable_force()->set_y(source.force().at(1));
+    p_target->mutable_force()->set_z(source.force().at(2));
+    p_target->mutable_torque()->set_x(source.force().at(3));
+    p_target->mutable_torque()->set_y(source.force().at(4));
+    p_target->mutable_torque()->set_z(source.force().at(5));
+    return true;
+  }
+  else if (source.force_size() == 1)
+  {
+    // Read out force torque data (1 DOF)
+    p_target->mutable_force()->set_x(source.force().at(0));
+    return true;
+  }
+
+  p_target->Clear();  // No FT data
+  return true;  // No FT sensor is not an error
+}
+
+
 bool parse(wrapper::Feedback* p_target, const EgmFeedBack& source, const RobotAxes axes)
 {
   bool success = false;
