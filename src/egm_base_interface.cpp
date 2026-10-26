@@ -768,7 +768,7 @@ const unsigned int EGMBaseInterface::WAIT_TIME_MS;
  * Primary methods
  */
 
-EGMBaseInterface::EGMBaseInterface(boost::asio::io_service& io_service,
+EGMBaseInterface::EGMBaseInterface(boost::asio::io_context& io_service,
                                    const unsigned short port_number,
                                    const BaseConfiguration& configuration)
 :

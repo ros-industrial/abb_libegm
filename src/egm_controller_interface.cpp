@@ -144,7 +144,7 @@ void EGMControllerInterface::ControllerMotion::writeOutputs(const wrapper::Outpu
  * Primary methods
  */
 
-EGMControllerInterface::EGMControllerInterface(boost::asio::io_service& io_service,
+EGMControllerInterface::EGMControllerInterface(boost::asio::io_context& io_service,
                                                const unsigned short port_number,
                                                const BaseConfiguration& configuration)
 :

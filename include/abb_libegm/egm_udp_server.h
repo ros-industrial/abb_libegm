@@ -38,6 +38,19 @@
 #define EGM_UDP_SERVER_H
 
 #include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
+#include <boost/version.hpp>
+
+#if BOOST_VERSION < 106600
+// boost::asio::io_context replaced io_service in Boost 1.66 (io_service was removed in 1.87).
+namespace boost
+{
+namespace asio
+{
+typedef io_service io_context;
+}
+}
+#endif
 
 namespace abb
 {
@@ -109,7 +122,7 @@ public:
    * \param port_number for the server's UDP socket.
    * \param p_interface that processes the received messages.
    */
-  UDPServer(boost::asio::io_service& io_service,
+  UDPServer(boost::asio::io_context& io_service,
             unsigned short port_number,
             AbstractUDPServerInterface* p_interface);
 

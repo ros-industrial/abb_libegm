@@ -46,7 +46,7 @@ namespace egm
  * Class definitions: UDPServer
  */
 
-UDPServer::UDPServer(boost::asio::io_service& io_service,
+UDPServer::UDPServer(boost::asio::io_context& io_service,
                      unsigned short port_number,
                      AbstractUDPServerInterface* p_interface)
 :
