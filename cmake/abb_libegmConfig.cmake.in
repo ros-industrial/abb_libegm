@@ -6,7 +6,11 @@ include(CMakeFindDependencyMacro)
 
 # Find dependencies
 find_dependency(Threads REQUIRED)
-find_dependency(Boost REQUIRED COMPONENTS regex system thread)
+find_dependency(Boost REQUIRED COMPONENTS regex thread)
+# Boost.System is only a compiled component before Boost 1.69 (see CMakeLists.txt).
+if(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 69)
+  find_dependency(Boost REQUIRED COMPONENTS regex system thread)
+endif()
 
 # Our library dependencies (contains definitions for IMPORTED targets)
 include("${CMAKE_CURRENT_LIST_DIR}/@PROJECT_NAME@Targets.cmake")

@@ -1329,7 +1329,7 @@ bool EGMTrajectoryInterface::TrajectoryMotion::retrieveExecutionProgress(traject
  * Primary methods
  */
 
-EGMTrajectoryInterface::EGMTrajectoryInterface(boost::asio::io_service& io_service,
+EGMTrajectoryInterface::EGMTrajectoryInterface(boost::asio::io_context& io_service,
                                                const unsigned short port_number,
                                                const TrajectoryConfiguration& configuration)
 :

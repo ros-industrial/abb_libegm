@@ -70,7 +70,7 @@ public:
    * \param port_number for the server's UDP socket.
    * \param configuration for the interface's configuration.
    */
-  EGMBaseInterface(boost::asio::io_service& io_service,
+  EGMBaseInterface(boost::asio::io_context& io_service,
                    const unsigned short port_number,
                    const BaseConfiguration& configuration = BaseConfiguration());
 

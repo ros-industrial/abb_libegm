@@ -20,7 +20,13 @@ endif()
 #########################
 ## Boost C++ Libraries ##
 #########################
-find_package(Boost REQUIRED COMPONENTS regex system thread)
+find_package(Boost REQUIRED COMPONENTS regex thread)
+# Boost.System is header-only since Boost 1.69 and its stub library was removed in Boost 1.89,
+# so it is only a compiled component on older versions.
+if(Boost_MAJOR_VERSION EQUAL 1 AND Boost_MINOR_VERSION LESS 69)
+  find_package(Boost REQUIRED COMPONENTS regex system thread)
+  set(ABB_LIBEGM_BOOST_SYSTEM Boost::system)
+endif()
 
 #############################
 ## Google Protocol Buffers ##
@@ -98,7 +104,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
 target_link_libraries(${PROJECT_NAME} PUBLIC
   Boost::regex
-  Boost::system
+  ${ABB_LIBEGM_BOOST_SYSTEM}
   Boost::thread
   ${PROTOBUF_LIBRARIES}
   Threads::Threads
